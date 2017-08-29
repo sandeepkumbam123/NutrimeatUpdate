@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="app.nutrimeat.meat.org.nutrimeat.Recipies.RecipiesDetailsActivity"
+    tools:showIn="@layout/activity_recipies_details">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_bold
+            android:id="@+id/product_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_horizontal_margin"
+            android:gravity="center"
+            android:text="Preparation Time"
+            android:textColor="#7D9C34"
+            android:textSize="21sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/divider"
+            android:gravity="center"
+            android:orientation="horizontal"
+
+            android:paddingBottom="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/dimen32"
+            android:weightSum="0.9">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Preparation Time"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="12sp" />
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+                    android:id="@+id/time_pre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen8"
+                    android:text="45 Minutes"
+                    android:textColor="@color/primary_text" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Serving"
+                    android:textColor="@color/colorAccent"
+
+                    android:textSize="12sp" />
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+                    android:id="@+id/serving"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen8"
+                    android:text="45 Minutes"
+                    android:textColor="@color/primary_text" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".3"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Calories"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="12sp" />
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+
+                    android:id="@+id/cals"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dimen8"
+                    android:text="250 INR"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="Ingredients:"
+            android:textColor="@color/black" />
+
+        <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+            android:id="@+id/ingredients_des"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/text_margin"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginRight="@dimen/text_margin" />
+
+        <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/activity_horizontal_margin"
+            android:text="Directions:"
+            android:textColor="@color/black" />
+
+        <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+            android:id="@+id/directions_des"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/text_margin"
+            android:layout_marginLeft="@dimen/text_margin"
+            android:layout_marginRight="@dimen/text_margin" />
+
+    </LinearLayout>
+
+</android.support.v4.widget.NestedScrollView>

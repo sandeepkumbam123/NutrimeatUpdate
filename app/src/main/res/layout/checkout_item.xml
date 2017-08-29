@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/cardview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dimen8"
+        android:background="@drawable/layout_shadow"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/proct"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <ImageView
+                android:id="@+id/item_pic"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_weight=".3"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+            </ImageView>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".50"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen8">
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold
+                    android:id="@+id/product_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="250"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/quantity_sp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".15"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dimen8">
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Price"
+                    android:textColor="@color/secondary_text" />
+
+                <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+                    android:id="@+id/item_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="00"
+                    android:textColor="@color/primary_text"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/delete"
+            android:layout_below="@+id/proct"
+            android:background="@drawable/rounded_cornors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="@dimen/dimen8">
+
+            <app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/delete"
+                android:text="Delete"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

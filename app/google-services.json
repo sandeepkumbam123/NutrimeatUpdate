@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "883870147489",
+    "project_id": "nutrimeat-147722"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883870147489:android:5c0d961ec348d8c7",
+        "android_client_info": {
+          "package_name": "app.nutrimeat.meat.org.nutrimeat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "883870147489-frc8m0id9jmdt0bk2busghmt51iql1jq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "app.nutrimeat.meat.org.nutrimeat",
+            "certificate_hash": "FDF72650BD9864EDF0FFC5754B52C8C44F600E57"
+          }
+        },
+        {
+          "client_id": "883870147489-upcn6hl37fqm9cf42dtkiimrv1q4hcl3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPMScJyD0wHLI9FpFJiLctttggFu6L4Lw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

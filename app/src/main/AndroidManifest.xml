@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="app.nutrimeat.meat.org.nutrimeat">
+
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true"/>
+
+    <application
+        android:name=".internetCheck.MyApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme.NoActionBar">
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+
+        <!--
+              <activity
+              android:name="com.facebook.FacebookActivity"
+              android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+              android:label="@string/app_name"
+              android:theme="@android:style/Theme.Translucent.NoTitleBar"
+              tools:replace="android:theme" />
+        -->
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"/>
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+
+                <data android:scheme="@string/fb_login_protocol_scheme"/>
+            </intent-filter>
+        </activity>
+        <!-- <activity -->
+        <!-- android:name=".product.ProductsActivity" -->
+        <!-- android:label="Chicken"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+        <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+        <!-- </intent-filter> -->
+        <!-- </activity> -->
+
+
+        <!-- This is starting activity -->
+        <service android:name=".Home.TrackGPS"/>
+
+        <activity
+            android:name=".splash.Splash"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".internetCheck.ConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".Signup"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".payment.PaymentActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Navdrawer"
+            android:label="@string/title_activity_navdrawer"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <!-- <activity -->
+        <!-- android:name=".splash.Splash" -->
+        <!-- android:label="@string/title_activity_products" -->
+        <!-- android:theme="@style/AppTheme.NoActionBar"></activity> -->
+
+        <activity
+            android:name=".ProductDetails.ProductDetailsActivity"
+            android:label="@string/title_activity_product_details"
+            android:parentActivityName=".Navdrawer"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.nutrimeat.meat.org.nutrimeat.Navdrawer"/>
+        </activity>
+        <activity
+            android:name=".Checkout.CheckoutActivity"
+            android:label="@string/title_activity_checkout"
+            android:parentActivityName=".Navdrawer"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.nutrimeat.meat.org.nutrimeat.Navdrawer"/>
+        </activity>
+        <activity
+            android:name=".Recipies.RecipiesDetailsActivity"
+            android:label="@string/title_activity_recipies_details"
+            android:parentActivityName=".Navdrawer"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.nutrimeat.meat.org.nutrimeat.Navdrawer"/>
+        </activity>
+
+        <service
+            android:name=".FetchAddressIntentService"
+            android:exported="false"/>
+
+        <activity
+            android:name=".BulkOrderActivity"
+            android:parentActivityName=".Recipies.RecipiesDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".payment.PayUActivity">
+        </activity>
+    </application>
+
+</manifest>

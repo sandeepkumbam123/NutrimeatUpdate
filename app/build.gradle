@@ -1,0 +1,80 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        config {
+            keyAlias 'Nutrimeat'
+            keyPassword 'Nutrimeat'
+            storeFile file('C:/Users/kumbh/Downloads/Nutrimeat-master/Nutrimeat-master/Nutrimeat.jks')
+            storePassword 'Nutrimeat'
+        }
+    }
+    compileSdkVersion 25
+    buildToolsVersion '25.0.0'
+    defaultConfig {
+        applicationId "app.nutrimeat.meat.org.nutrimeat"
+        minSdkVersion 15
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    repositories {
+        maven {
+            url "https://dl.bintray.com/sasidhar-678/maven"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            buildConfigField "String", "MERCHANT_KEY", '"m3pWGL"'
+            buildConfigField "String", "PAYU_URL", '"https://secure.payu.in/_payment"'
+            buildConfigField "String", "SALT_KEY", '"RbHCQkbb"'
+            buildConfigField "String", "S_URL", '"https://test.payu.in/_payment"'
+            buildConfigField "String", "F_URL", '"https://test.payu.in/_payment"'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            buildConfigField "String", "MERCHANT_KEY", '"m3pWGL"'
+            buildConfigField "String", "PAYU_URL", '"https://secure.payu.in/_payment"'
+            buildConfigField "String", "S_URL", '"https://test.payu.in/_payment"'
+            buildConfigField "String", "F_URL", '"https://payu.herokuapp.com/failure"'
+            buildConfigField "String", "SALT_KEY", '"RbHCQkbb"'
+            minifyEnabled false
+            signingConfig signingConfigs.config
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+//    compile project(':payUMoneysdk')
+//    compile project(path: ':payUMoneysdk')
+
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:support-v4:25.0.0'
+    compile 'com.android.support:design:25.0.0'
+    compile 'com.google.android.gms:play-services:9.8.0'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.google.android.gms:play-services-auth:9.8.0'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta3'
+    compile 'com.android.support:recyclerview-v7:25.0.0'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-scalars:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.makeramen:roundedimageview:2.2.1'
+    compile 'pub.devrel:easypermissions:0.3.0'
+    compile 'com.sasidhar.smaps.payumoney:payumoney:0.0.3'
+    compile 'uk.co.chrisjenx:calligraphy:2.3.0'
+    compile 'com.payu.custombrowser:payu-custom-browser:6.0.0'
+    compile 'com.payu.magicretry:magicretry:1.0.4'
+    testCompile 'junit:junit:4.12'
+}
+apply plugin: 'com.google.gms.google-services'
