@@ -89,7 +89,7 @@ public class PrefManager {
     }
 
     public boolean canCheckout() {
-        return pref.getBoolean(CAN_ENABLE_CHECKOUT, true);
+        return pref.getBoolean(CAN_ENABLE_CHECKOUT, false);
     }
 
     public void setLoginUserId(String input) {

@@ -1,5 +1,6 @@
 package app.nutrimeat.meat.org.nutrimeat.Checkout;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -9,13 +10,19 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,8 +32,15 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationServices;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -38,12 +52,14 @@ import java.util.List;
 
 import app.nutrimeat.meat.org.nutrimeat.BuildConfig;
 import app.nutrimeat.meat.org.nutrimeat.CommonFunctions;
+import app.nutrimeat.meat.org.nutrimeat.Home.TrackGPS;
 import app.nutrimeat.meat.org.nutrimeat.PrefManager;
 import app.nutrimeat.meat.org.nutrimeat.R;
 import app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold;
 import app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular;
 import app.nutrimeat.meat.org.nutrimeat.api.API;
 import app.nutrimeat.meat.org.nutrimeat.api.CheckUser;
+import app.nutrimeat.meat.org.nutrimeat.api.UpdateOrderStatus;
 import app.nutrimeat.meat.org.nutrimeat.payment.PayUActivity;
 import app.nutrimeat.meat.org.nutrimeat.payment.PaymentActivity;
 import app.nutrimeat.meat.org.nutrimeat.product.ModelCart;
@@ -60,6 +76,8 @@ import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PRODUCT_CART;
 public class CheckoutActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = CheckoutActivity.class.getSimpleName();
     // ArrayList<ModelCart> ListofProdcuts = new ArrayList<>();
+    private static final int MY_PERMISSIONS_REQUEST_LOCATION =01;
+
     RecyclerView Checkout_rv;
 
     ArrayList<Double> price = new ArrayList<>();
@@ -88,6 +106,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private String landmark;
     private String orderType;
     private String transactionId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,12 +202,52 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         //  super.onBackPressed();
     }
 
+
+    public boolean canCheckOut() {
+        LocationManager mLocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        TrackGPS mLocListener = new TrackGPS();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION ,Manifest.permission.ACCESS_COARSE_LOCATION},
+                    MY_PERMISSIONS_REQUEST_LOCATION);
+            Toast.makeText(this, "Please Enable Location to check our delivery availability", Toast.LENGTH_SHORT).show();
+        }
+        else {
+
+            mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocListener);
+
+
+            Location location =mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
+                    mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) ;
+
+        return inRange(mLocListener, location);
+        }
+
+        return false ;
+
+    }
+
+    public boolean inRange(TrackGPS gps ,Location deviceLocation) {
+        if(gps.getDistanceBetweenLatLang(gps.getCenterLocation(),deviceLocation) < gps.MAX_ORDER_DISTANCE) {
+            return true ;
+        }
+        return false;
+    }
+
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnCheckout:
                 PrefManager manager = new PrefManager(getApplicationContext());
-                if (manager.canCheckout()) {
+                if (canCheckOut()) {
 
                     List<ModelCart> cart_itens;
                     if (isPreorder()) {
@@ -464,11 +523,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         showProgressDialog(true);
-        API api = retrofit.create(API.class);
+        final API api = retrofit.create(API.class);
         CheckUser checkUser = new CheckUser();
         PrefManager prefManager = new PrefManager(this);
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String orderTime = dateFormat.format(new Date());
+        final String orderTime = dateFormat.format(new Date());
         Call<AddOrderItemResponse> addOrderItemCall = api.addOrder(orderNum  ,prefManager.getEmail(), 300,
                 "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation,
                 "Hyderabad", "Telangana", "India", "500047",
@@ -480,15 +539,52 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onResponse(Call<AddOrderItemResponse> call, Response<AddOrderItemResponse> response) {
                 showProgressDialog(false);
-                AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                builder.setMessage("Your request has been placed").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                UpdateOrderStatus model = new UpdateOrderStatus();
+                model.setOrderNumber(orderNum);
+                model.setReferenceNumber(orderTime);
+                Call<Object> orderStatusCall =  api.getOrderStatus(model);
+                orderStatusCall.enqueue(new Callback<Object>() {
                     @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());
-                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART,new ArrayList<ModelCart>());
-                        finish();
+                    public void onResponse(Call<Object> call, Response<Object> response) {
+                        try {
+                            JSONObject object = new JSONObject(response.body().toString());
+                           String status = object.optString("status");
+                            if(!status.equalsIgnoreCase("failed")) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
+                                builder.setMessage("Your request has been placed").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());
+                                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART,new ArrayList<ModelCart>());
+                                        finish();
+                                    }
+                                }).show();
+                            } else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
+                                builder.setMessage("Unable to place your order at this point of time , if Amount deducted will be refunded to your account within 2-3 business days.Make note of this order id for future references :"+orderNum).setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        finish();
+                                    }
+                                }).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }).show();
+
+                    @Override
+                    public void onFailure(Call<Object> call, Throwable t) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
+                        builder.setMessage("Unable to place your order at this point of time .").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                finish();
+                            }
+                        }).show();
+                    }
+                });
+
             }
 
             @Override
@@ -642,4 +738,24 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
     /******************************************************/
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_LOCATION :
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Location Tag", "Location access give");
+                    // permissagion was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+
+        }
+    }
 }

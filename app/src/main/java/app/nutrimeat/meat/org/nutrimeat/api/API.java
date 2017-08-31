@@ -39,6 +39,8 @@ public interface API {
     Call<ServerResponse> sendSms(@Body SendSMS sendSMS);
 
 
+    @POST ("main/update_order_status/format/json")
+    Call<Object> getOrderStatus(@Body UpdateOrderStatus orderRequest );
 
     @POST("main/verify_sms/format/json")
     Call<ServerResponse> verifysms(@Body VerifySMS verifySMS);
