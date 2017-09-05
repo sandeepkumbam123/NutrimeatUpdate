@@ -425,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         if (!e1.equalsIgnoreCase("") && !p1.equalsIgnoreCase("")) {
 
             progressDialog = ProgressDialog.show(this, "Please wait ...", "Logging User...", true);
+
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.api_url))
                     .addConverterFactory(GsonConverterFactory.create())

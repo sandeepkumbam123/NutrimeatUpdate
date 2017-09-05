@@ -15,11 +15,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import app.nutrimeat.meat.org.nutrimeat.api.API;
 import app.nutrimeat.meat.org.nutrimeat.api.Request;
 import app.nutrimeat.meat.org.nutrimeat.api.SendSMS;
 import app.nutrimeat.meat.org.nutrimeat.api.ServerResponse;
 import app.nutrimeat.meat.org.nutrimeat.api.VerifySMS;
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -78,10 +83,19 @@ public class Signup extends AppCompatActivity {
         }
         if (!n1.equalsIgnoreCase("") && !e1.equalsIgnoreCase("") && !p1.equalsIgnoreCase("") && !m1.equalsIgnoreCase("")) {
             progressDialog = ProgressDialog.show(this, "Please wait ...", "Logging User...", true);
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(getString(R.string.api_url))
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .build();
+
+             OkHttpClient.Builder  httpClient = new OkHttpClient.Builder();
+            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+            httpClient.interceptors().add(interceptor);
+
 
             API api = retrofit.create(API.class);
             Request request = new Request();
