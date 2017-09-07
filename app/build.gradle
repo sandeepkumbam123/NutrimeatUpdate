@@ -75,6 +75,9 @@ dependencies {
     compile 'uk.co.chrisjenx:calligraphy:2.3.0'
     compile 'com.payu.custombrowser:payu-custom-browser:6.0.0'
     compile 'com.payu.magicretry:magicretry:1.0.4'
+    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
+
+
     testCompile 'junit:junit:4.12'
 }
 apply plugin: 'com.google.gms.google-services'
