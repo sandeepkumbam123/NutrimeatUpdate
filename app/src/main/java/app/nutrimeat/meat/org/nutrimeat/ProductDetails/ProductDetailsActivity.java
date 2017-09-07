@@ -154,7 +154,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
                         Double act_price = product.getItem_price();
                         Double quantity_price = act_price * val;
                         item_price.setText(String.valueOf(quantity_price));
-                        products.setQuantity(String.valueOf(quantityList.get(position)));
+                        model_in_cart.setSelected_quantity(String.valueOf(val));
+//                        products.setQuantity(String.valueOf(quantityList.get(position)));
                         if (product_exist) {
                             if (++q > 0)
                                 updateshared();
@@ -166,7 +167,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
                     @Override
                     public void onNothingSelected(AdapterView<?> parentView) {
                         // your code here
-                        products.setQuantity(String.valueOf(quantityList.get(0)));
+                        model_in_cart.setSelected_quantity(String.valueOf(quantityList.get(0)));
+//                        products.setQuantity(String.valueOf(quantityList.get(0)));
                     }
 
                 });
@@ -181,7 +183,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
                     @Override
                     public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                         if (product_exist) {
-                            products.setDesired_cut(String.valueOf(desiredList.get(position)));
+                            model_in_cart.setSelected_desired_cut(String.valueOf(desiredList.get(position)));
+//                            products.setDesired_cut(String.valueOf(desiredList.get(position)));
                             if (++d > 0)
                                 updateshared();
                         }
@@ -191,7 +194,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
                     @Override
                     public void onNothingSelected(AdapterView<?> parentView) {
                         // your code here
-                        products.setDesired_cut(String.valueOf(desiredList.get(0)));
+//                        products.setDesired_cut(String.valueOf(desiredList.get(0)));
+                        model_in_cart.setSelected_desired_cut(String.valueOf(desiredList.get(0)));
                     }
 
                 });
