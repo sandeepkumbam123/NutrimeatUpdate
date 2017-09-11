@@ -106,6 +106,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private String landmark;
     private String orderType;
     private String transactionId;
+    private  Location location;
 
 
     @Override
@@ -225,7 +226,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocListener);
 
 
-            Location location =mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
+           location =mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
                     mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) ;
 
         return inRange(mLocListener, location);
@@ -442,7 +443,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         dialog.findViewById(R.id.textview_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                orderType = "Standard";
+                orderType = "Online Payment";
                 dialog.dismiss();
                 navigateToPayU();
             }
@@ -529,11 +530,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final String orderTime = dateFormat.format(new Date());
         Call<AddOrderItemResponse> addOrderItemCall = api.addOrder(orderNum  ,prefManager.getEmail(), 300,
-                "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation,
+                "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation +","+landmark,
                 "Hyderabad", "Telangana", "India", "500047",
                 "LBNAGAR", prefManager.getMobile()==null?"9502675775":prefManager.getMobile() ,
-                 orderTime,"standard", getDate(mCalendar),
-                getTime(mCalendar), "");
+                 orderType,"standard", getDate(mCalendar),
+                getTime(mCalendar), "" ,location == null ? "" :location.getLongitude()+"",location == null ? "" :location.getLatitude()+"");
 //                                    progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Validating Password...", true, false);
         addOrderItemCall.enqueue(new Callback<AddOrderItemResponse>() {
             @Override

@@ -132,6 +132,8 @@ public interface API {
             @Field("ord_type") String orderType,
             @Field("ord_pre_date") String orderPreDate,
             @Field("ord_pre_time") String orderPreTime,
-            @Field("ord_online_transaction") String onlineTransaction);
+            @Field("ord_online_transaction") String onlineTransaction ,
+            @Field("ord_user_longitude ") String userLongitude ,
+            @Field("ord_user_latitude") String userLatitude );
 
 }
