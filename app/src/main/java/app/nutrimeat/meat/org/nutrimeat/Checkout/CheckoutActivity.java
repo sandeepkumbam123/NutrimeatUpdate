@@ -248,7 +248,9 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         switch (view.getId()) {
             case R.id.btnCheckout:
                 PrefManager manager = new PrefManager(getApplicationContext());
-                if (canCheckOut()) {
+                LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+                if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
+                    if (canCheckOut()) {
 
                     List<ModelCart> cart_itens;
                     if (isPreorder()) {
@@ -282,11 +284,14 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                         }
 
 //                        navigateUserToPayment(cart_itens);
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No items added to card", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(getApplicationContext(), "No items added to card", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "We cannot deliver order to your location", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "We cannot deliver order to your location", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Enable your location to check if order can be delivered to your location .", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case R.id.textview_date:
@@ -543,48 +548,15 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 UpdateOrderStatus model = new UpdateOrderStatus();
                 model.setOrderNumber(orderNum);
                 model.setReferenceNumber(orderTime);
-                Call<Object> orderStatusCall =  api.getOrderStatus(model);
-                orderStatusCall.enqueue(new Callback<Object>() {
+                AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
+                builder.setMessage("Your request has been placed").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
-                    public void onResponse(Call<Object> call, Response<Object> response) {
-                        try {
-                            JSONObject object = new JSONObject(response.body().toString());
-                           String status = object.optString("status");
-                            if(!status.equalsIgnoreCase("failed")) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                                builder.setMessage("Your request has been placed").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());
-                                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART,new ArrayList<ModelCart>());
-                                        finish();
-                                    }
-                                }).show();
-                            } else {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                                builder.setMessage("Unable to place your order at this point of time , if Amount deducted will be refunded to your account within 2-3 business days.Make note of this order id for future references :"+orderNum).setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        finish();
-                                    }
-                                }).show();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());
+                        CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART,new ArrayList<ModelCart>());
+                        finish();
                     }
-
-                    @Override
-                    public void onFailure(Call<Object> call, Throwable t) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                        builder.setMessage("Unable to place your order at this point of time .").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                finish();
-                            }
-                        }).show();
-                    }
-                });
+                }).show();
 
             }
 

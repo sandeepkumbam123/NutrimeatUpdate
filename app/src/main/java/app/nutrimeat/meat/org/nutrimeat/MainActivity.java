@@ -474,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
 
                 @Override
                 public void onFailure(Call<ServerResponse> call, Throwable t) {
-
+                    progressDialog.dismiss();
                     Log.d("RESPONSE_Login", "onFailure: " + t.getMessage());
                     Toast.makeText(getApplicationContext(), "Internal error. Please Try Again", Toast.LENGTH_SHORT).show();
                 }

@@ -26,7 +26,7 @@ import app.nutrimeat.meat.org.nutrimeat.PrefManager;
 
 public class TrackGPS extends Service implements LocationListener {
 
-    public static final int MAX_ORDER_DISTANCE = 5000;
+    public static final int MAX_ORDER_DISTANCE = 6000;
     private Context mContext;
 
 
