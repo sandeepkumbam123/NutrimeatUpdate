@@ -38,7 +38,7 @@ public interface API {
     @POST("main/send_sms/format/json")
     Call<ServerResponse> sendSms(@Body SendSMS sendSMS);
 
-
+    @Headers("X-API-KEY:80w0g4o84wsc4gsc804c08scs00w8co4wscg848c")
     @POST ("main/update_order_status/format/json")
     Call<Object> getOrderStatus(@Body UpdateOrderStatus orderRequest );
 

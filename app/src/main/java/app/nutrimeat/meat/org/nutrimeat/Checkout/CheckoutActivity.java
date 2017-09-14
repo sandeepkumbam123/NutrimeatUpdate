@@ -551,9 +551,26 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onResponse(Call<AddOrderItemResponse> call, Response<AddOrderItemResponse> response) {
                 showProgressDialog(false);
-                UpdateOrderStatus model = new UpdateOrderStatus();
-                model.setOrderNumber(orderNum);
-                model.setReferenceNumber(orderTime);
+
+                if(orderType.equalsIgnoreCase("Online Payment")) {
+                    UpdateOrderStatus model = new UpdateOrderStatus();
+                    model.setOrderNumber(orderNum);
+                    model.setReferenceNumber(transactionId);
+                    Call<Object> updateOrder = api.getOrderStatus(model);
+
+                    updateOrder.enqueue(new Callback<Object>() {
+                        @Override
+                        public void onResponse(Call<Object> call, Response<Object> response) {
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<Object> call, Throwable t) {
+
+                        }
+                    });
+
+                }
                 AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
                 builder.setMessage("Your request has been placed").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -691,7 +708,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         if (requestCode == 100) {
             if (resultCode == RESULT_OK) {
                 //update order status api
-                transactionId= "";
+                transactionId= data.getStringExtra(getString(R.string.cb_payu_response));
                 updateOrderStatus();
             } else {
                 showErrorDialog();
