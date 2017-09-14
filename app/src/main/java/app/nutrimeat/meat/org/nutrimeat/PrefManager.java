@@ -35,11 +35,27 @@ public class PrefManager {
     private static final String EMAIL = "email";
     private static final String NAME = "name";
     private static final String MOBILE = "mobile";
+    private static  final String LATITUDE = "latitude";
+    private static final String LONGITUDE = "longitude";
 
     public PrefManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
+    }
+
+    public void setLatLong(String latitude , String longitude) {
+        editor.putString(LATITUDE , latitude);
+        editor.putString(LONGITUDE ,longitude);
+        editor.commit();
+    }
+
+    public double getLong(){
+        return Double.parseDouble(pref.getString(LONGITUDE, "0"));
+    }
+
+    public double getLat() {
+        return Double.parseDouble(pref.getString(LATITUDE , "0"));
     }
 
     public void setFirstTimeLaunch(boolean isFirstTime) {

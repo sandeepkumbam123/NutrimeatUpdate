@@ -246,6 +246,7 @@ public class TrackGPS extends Service implements LocationListener {
 
     public Location getCenterLocation() {
         Location location = new Location("");
+        //Nutrimeat Location  17.3478735,78.5412692
         location.setLatitude(17.3478735);
         location.setLongitude(78.5412692);
         return location;
@@ -254,6 +255,8 @@ public class TrackGPS extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         if (location != null) {
+            PrefManager prefs = new PrefManager(mContext);
+            prefs.setLatLong(String.valueOf(location.getLatitude()),String.valueOf(location.getLongitude()));
             validateLocation(location);
         }
     }

@@ -107,6 +107,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private String orderType;
     private String transactionId;
     private  Location location;
+    private PrefManager prefs;
 
 
     @Override
@@ -114,6 +115,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         mCalendar = Calendar.getInstance();
         setContentView(R.layout.activity_checkout);
+        prefs = new PrefManager(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -225,11 +227,15 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
             mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocListener);
 
-
-           location =mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
-                    mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) ;
-
-        return inRange(mLocListener, location);
+            if(prefs.getLat()!=0 && prefs.getLong()!=0) {
+                location = new Location("");
+                location.setLongitude(prefs.getLong());
+                location.setLatitude(prefs.getLat());
+            } else {
+                location = mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
+                        mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+            return inRange(mLocListener, location);
         }
 
         return false ;
@@ -252,36 +258,36 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
                     if (canCheckOut()) {
 
-                    List<ModelCart> cart_itens;
-                    if (isPreorder()) {
-                        cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
-                    } else {
-                        cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
-                    }
-
-                    if (cart_itens != null && cart_itens.size() > 0) {
+                        List<ModelCart> cart_itens;
                         if (isPreorder()) {
-                            if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
-                                showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
-                                return;
-                            }
-                            long diff = mCalendar.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
-                            long day = 24 * 60 * 60 * 1000;
-                            if (diff > day) {
-//                                navigateToPayU();
-                                showDialog();
-                            } else {
-                                Toast.makeText(this, "Please select valid date", Toast.LENGTH_SHORT).show();
-                            }
-
+                            cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
                         } else {
-                            if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
-                                showPreOrderDiialog("Store is closed now. You can Pre-Order");
-                                return;
-                            }
-
-                            showDialog();
+                            cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
                         }
+
+                        if (cart_itens != null && cart_itens.size() > 0) {
+                            if (isPreorder()) {
+                                if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                    showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
+                                    return;
+                                }
+                                long diff = mCalendar.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+                                long day = 24 * 60 * 60 * 1000;
+                                if (diff > day) {
+//                                navigateToPayU();
+                                    showDialog();
+                                } else {
+                                    Toast.makeText(this, "Please select valid date", Toast.LENGTH_SHORT).show();
+                                }
+
+                            } else {
+                                if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                    showPreOrderDiialog("Store is closed now. You can Pre-Order");
+                                    return;
+                                }
+
+                                showDialog();
+                            }
 
 //                        navigateUserToPayment(cart_itens);
                         } else {
@@ -436,7 +442,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                     etLandmark.setError("Landmark can't be empty");
                     etLandmark.requestFocus();
                 }else{
-                     deliveryLocation = etDeliveryLocation.getText().toString().trim();
+                    deliveryLocation = etDeliveryLocation.getText().toString().trim();
                     landmark = etDeliveryLocation.getText().toString().trim();
                     orderType = "Cash On Delivery";
                     dialog.dismiss();
@@ -538,7 +544,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation +","+landmark,
                 "Hyderabad", "Telangana", "India", "500047",
                 "LBNAGAR", prefManager.getMobile()==null?"9502675775":prefManager.getMobile() ,
-                 orderType,"standard", getDate(mCalendar),
+                orderType,"standard", getDate(mCalendar),
                 getTime(mCalendar), "" ,location == null ? "" :location.getLongitude()+"",location == null ? "" :location.getLatitude()+"");
 //                                    progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Validating Password...", true, false);
         addOrderItemCall.enqueue(new Callback<AddOrderItemResponse>() {
@@ -612,7 +618,6 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
         txnId = "NM_" + System.currentTimeMillis();
         amount = String.valueOf(checkoutAdapter.getSub_total());
-        amount = "0";
         PrefManager prefManager = new PrefManager(this);
 
         f_Name = prefManager.getName();

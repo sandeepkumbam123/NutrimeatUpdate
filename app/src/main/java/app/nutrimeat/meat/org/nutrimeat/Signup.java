@@ -126,8 +126,6 @@ public class Signup extends AppCompatActivity {
                         Log.d("Mobile_pref", prefManager.getMobile());
                         sendSMS(prefManager.getMobile());
 
-                        Intent loginScreen = new Intent(Signup.this,MainActivity.class);
-                        startActivity(loginScreen);
                     }
 
                 }
@@ -225,6 +223,8 @@ public class Signup extends AppCompatActivity {
                                     Log.d("ERROR", response1.getError());
                                     Toast.makeText(getApplicationContext(), response1.getError(), Toast.LENGTH_SHORT).show();
                                 } else {
+                                    Intent loginScreen = new Intent(Signup.this,MainActivity.class);
+                                    startActivity(loginScreen);
                                     Toast.makeText(getApplicationContext(), response1.getStatus(), Toast.LENGTH_SHORT).show();
                                 }
                             }
