@@ -3,6 +3,7 @@ package app.nutrimeat.meat.org.nutrimeat;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -124,6 +125,9 @@ public class Signup extends AppCompatActivity {
                         Log.d("Email_pref", prefManager.getEmail());
                         Log.d("Mobile_pref", prefManager.getMobile());
                         sendSMS(prefManager.getMobile());
+
+                        Intent loginScreen = new Intent(Signup.this,MainActivity.class);
+                        startActivity(loginScreen);
                     }
 
                 }
