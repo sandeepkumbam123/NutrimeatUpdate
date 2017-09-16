@@ -37,6 +37,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONException;
@@ -73,7 +74,11 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PREORDER_CART;
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PRODUCT_CART;
 
-public class CheckoutActivity extends AppCompatActivity implements View.OnClickListener {
+public class CheckoutActivity extends AppCompatActivity implements View.OnClickListener ,LocationListener{
+
+
+    public static final int MAX_ORDER_DISTANCE = 6000;
+
     private static final String TAG = CheckoutActivity.class.getSimpleName();
     // ArrayList<ModelCart> ListofProdcuts = new ArrayList<>();
     private static final int MY_PERMISSIONS_REQUEST_LOCATION =01;
@@ -108,6 +113,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private String transactionId;
     private  Location location;
     private PrefManager prefs;
+    private Location deviceLocation ;
 
 
     @Override
@@ -227,23 +233,37 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
             mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocListener);
 
-            if(prefs.getLat()!=0 && prefs.getLong()!=0) {
-                location = new Location("");
-                location.setLongitude(prefs.getLong());
-                location.setLatitude(prefs.getLat());
-            } else {
+
                 location = mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
                         mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            }
-            return inRange(mLocListener, location);
+//            }
+            if( location != null )
+            Toast.makeText(CheckoutActivity.this, "Latitude : "+location.getLatitude()+ " Longitude :" +
+                    " "+location.getLongitude()+"", Toast.LENGTH_SHORT).show();
+             // location is null , unable to fetch
+            // the location details so maintaining it as null .
+            return deviceLocation == null ? false : inRange( deviceLocation);
         }
 
         return false ;
 
     }
 
-    public boolean inRange(TrackGPS gps ,Location deviceLocation) {
-        if(gps.getDistanceBetweenLatLang(gps.getCenterLocation(),deviceLocation) < gps.MAX_ORDER_DISTANCE) {
+    public int getDistanceBetweenLatLang(Location loc1, Location loc2) {
+        return (int) loc1.distanceTo(loc2);
+    }
+
+    public Location getCenterLocation() {
+        Location location = new Location("");
+        //Nutrimeat Location  17.3478735,78.5412692
+        location.setLatitude(17.3478735);
+        location.setLongitude(78.5412692);
+        return location;
+    }
+
+    public boolean inRange(Location deviceLocation) {
+        Toast.makeText(CheckoutActivity.this, "Your distance is about "+(getDistanceBetweenLatLang(getCenterLocation(),deviceLocation))/1000 +"kilometers from the Store .", Toast.LENGTH_SHORT).show();
+        if(getDistanceBetweenLatLang(getCenterLocation(),deviceLocation) < MAX_ORDER_DISTANCE) {
             return true ;
         }
         return false;
@@ -752,5 +772,10 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 return;
 
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        deviceLocation = location;
     }
 }

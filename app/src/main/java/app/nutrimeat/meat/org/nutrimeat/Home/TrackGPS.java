@@ -49,6 +49,7 @@ public class TrackGPS extends Service implements LocationListener {
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1;
     protected LocationManager locationManager;
     private int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+    PrefManager manager;
 
     public TrackGPS() {
     }
@@ -56,12 +57,15 @@ public class TrackGPS extends Service implements LocationListener {
     public TrackGPS(Activity mContext) {
         this.mContext = mContext;
         getLocation();
+
+
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         mContext = getApplicationContext();
+        manager = new PrefManager(this);
         getLocation();
     }
 
@@ -236,7 +240,6 @@ public class TrackGPS extends Service implements LocationListener {
     }
 
     public void validateLocation(Location location) {
-        PrefManager manager = new PrefManager(getApplicationContext());
         if (getDistanceBetweenLatLang(location, getCenterLocation()) < MAX_ORDER_DISTANCE) {
             manager.setEnableCheckout(true);
         } else {
@@ -252,13 +255,10 @@ public class TrackGPS extends Service implements LocationListener {
         return location;
     }
 
+
+
     @Override
     public void onLocationChanged(Location location) {
-        if (location != null) {
-            PrefManager prefs = new PrefManager(mContext);
-            prefs.setLatLong(String.valueOf(location.getLatitude()),String.valueOf(location.getLongitude()));
-            validateLocation(location);
-        }
     }
 
     @Override

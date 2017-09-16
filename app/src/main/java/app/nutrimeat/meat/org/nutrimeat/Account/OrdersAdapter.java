@@ -149,7 +149,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
         email.setText("Email : " + product.getOrd_user_fk());
         phone.setText("Phone Number : " + product.getOrd_demo_phone());
         total_weight.setText("Total Weight : " + df.format(product.getOrd_total_weight()));
-        main_total_price.setText("Total Price : " + String.valueOf(product.getOrd_item_summary_total()));
+        main_total_price.setText("Total Price : " + String.valueOf(product.getOrd_total()));
         order_type.setText("Order Type: " + String.valueOf(product.getOrd_type()));
         payment_method.setText("Payment Method : " + String.valueOf(product.getOrd_payment_mode()));
         getitem_details(user_name, String.valueOf(product.getOrd_order_number()), items_holder);
