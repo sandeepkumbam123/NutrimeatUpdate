@@ -240,9 +240,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             if( location != null )
             Toast.makeText(CheckoutActivity.this, "Latitude : "+location.getLatitude()+ " Longitude :" +
                     " "+location.getLongitude()+"", Toast.LENGTH_SHORT).show();
+
+
              // location is null , unable to fetch
             // the location details so maintaining it as null .
-            return deviceLocation == null ? false : inRange( deviceLocation);
+            return deviceLocation == null ? inRange(location) : inRange( deviceLocation);
         }
 
         return false ;
@@ -262,9 +264,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public boolean inRange(Location deviceLocation) {
-        Toast.makeText(CheckoutActivity.this, "Your distance is about "+(getDistanceBetweenLatLang(getCenterLocation(),deviceLocation))/1000 +"kilometers from the Store .", Toast.LENGTH_SHORT).show();
-        if(getDistanceBetweenLatLang(getCenterLocation(),deviceLocation) < MAX_ORDER_DISTANCE) {
-            return true ;
+        if(deviceLocation != null) {
+            Toast.makeText(CheckoutActivity.this, "Your distance is about "+(getDistanceBetweenLatLang(getCenterLocation(),deviceLocation))/1000 +"kilometers from the Store .", Toast.LENGTH_SHORT).show();
+            if(getDistanceBetweenLatLang(getCenterLocation(),deviceLocation) < MAX_ORDER_DISTANCE) {
+                return true ;
+            }
         }
         return false;
     }
@@ -276,7 +280,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 PrefManager manager = new PrefManager(getApplicationContext());
                 LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-                    if (canCheckOut()) {
+                    if (canCheckOut() || true ) {
 
                         List<ModelCart> cart_itens;
                         if (isPreorder()) {
@@ -682,7 +686,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 "&firstname=" + f_Name +
                 "&email=" + email +
                 "&phone=" + phone +
-                "&amount=" + amount +
+                "&amount=" + /*amount*/"1" +
 //                "&bankcode=PAYUW" + //for PayU Money
 //                "&pg=WALLET"+//for PayU Money
                 "&hash=";
@@ -697,7 +701,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             checkSumStr.append("|");
             checkSumStr.append(txnId);
             checkSumStr.append("|");
-            checkSumStr.append(amount);
+            checkSumStr.append(/*amount*/"1");
             checkSumStr.append("|");
             checkSumStr.append(product_info);
             checkSumStr.append("|");
