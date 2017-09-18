@@ -24,14 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.nutrimeat.meat.org.nutrimeat.Account.AcountFragment;
+import app.nutrimeat.meat.org.nutrimeat.Account.User_Details_Model;
 import app.nutrimeat.meat.org.nutrimeat.Checkout.CheckoutActivity;
 import app.nutrimeat.meat.org.nutrimeat.Home.StatsResponseModel;
 import app.nutrimeat.meat.org.nutrimeat.Home.TrackGPS;
+import app.nutrimeat.meat.org.nutrimeat.api.API;
 import app.nutrimeat.meat.org.nutrimeat.drawer.BulkOrder;
 import app.nutrimeat.meat.org.nutrimeat.drawer.ContactUs;
 import app.nutrimeat.meat.org.nutrimeat.drawer.Recipes;
 import app.nutrimeat.meat.org.nutrimeat.product.ModelCart;
 import app.nutrimeat.meat.org.nutrimeat.product.Products;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PREORDER_CART;
@@ -45,6 +52,7 @@ public class Navdrawer extends AppCompatActivity
     private PrefManager prefManager;
     private StatsResponseModel statsResponseModel = null;
     private TextView txtViewCount;
+    private  TextView emailNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,17 +83,46 @@ public class Navdrawer extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.getMenu().getItem(0).setChecked(true);
         View header = navigationView.getHeaderView(0);
-        TextView emailNav = (TextView) header.findViewById(R.id.emailNav);
+       emailNav = (TextView) header.findViewById(R.id.emailNav);
         if (prefManager.getName() != null) {
             emailNav.setText(prefManager.getName());
         }
         //add this line to display menu1 when the activity is loaded
         displaySelectedScreen(ids);
 
+        getUserDetails(prefManager.getUserId());
+
 
 
     }
 
+
+    private void getUserDetails( String s) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.api_url))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        final API api = retrofit.create(API.class);
+        Call<User_Details_Model> call = api.userDetails(s);
+        call.enqueue(new Callback<User_Details_Model>() {
+            @Override
+            public void onResponse(Call<User_Details_Model> call, Response<User_Details_Model> response) {
+                User_Details_Model model = response.body();
+                prefManager.setEmail(model.getEmail());
+                prefManager.setMobile(model.getPhoneNumber());
+                prefManager.setName(model.getUserName());
+
+                if(emailNav != null) {
+                    emailNav.setText(model.getUserName()==null?prefManager.getMobile():prefManager.getName());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User_Details_Model> call, Throwable t) {
+
+            }
+        });
+    }
     @Override
     public void setTitle(CharSequence title) {
 //        super.setTitle(title);

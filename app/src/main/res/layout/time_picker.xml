@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="10dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:text="Select Time"
+        android:gravity="center"
+        android:layout_alignParentTop="true"
+        android:background="@android:color/holo_red_light"/>
+    <Spinner
+        android:id="@+id/spinner_hour"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:padding="5dp"
+        ></Spinner>
+    <Spinner
+        android:id="@+id/spinner_minute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_toRightOf="@+id/spinner_hour"
+        android:padding="5dp"></Spinner>
+    <TextView
+        android:id="@+id/okay_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/spinner_minute"
+        android:layout_alignParentEnd="true"
+        android:padding="5dp"
+        android:text="Okay"
+        android:textColor="@android:color/white"
+        android:background="@android:color/holo_red_light"
+        />
+
+</RelativeLayout>

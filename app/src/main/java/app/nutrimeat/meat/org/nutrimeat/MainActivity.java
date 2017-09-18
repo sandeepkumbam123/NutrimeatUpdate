@@ -446,6 +446,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
                     Log.d("Status", response1.getStatus());
                     progressDialog.dismiss();
                     getUserDetails(api,email.getText().toString());
+                    prefManager.setUserId(email.getText().toString());
                     if (response1.getStatus().equalsIgnoreCase("failed")) {
                         Log.d("ERROR", response1.getError());
                         Toast.makeText(getApplicationContext(), response1.getError(), Toast.LENGTH_SHORT).show();

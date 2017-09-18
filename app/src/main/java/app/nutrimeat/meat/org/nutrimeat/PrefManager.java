@@ -37,6 +37,7 @@ public class PrefManager {
     private static final String MOBILE = "mobile";
     private static  final String LATITUDE = "latitude";
     private static final String LONGITUDE = "longitude";
+    public static final String USER_ID ="user_id";
 
     public PrefManager(Context context) {
         this._context = context;
@@ -70,6 +71,16 @@ public class PrefManager {
 
     public String getEmail() {
         return pref.getString(EMAIL, null);
+    }
+
+
+    public void setUserId(String userId) {
+        editor.putString(USER_ID , userId);
+        editor.commit();
+    }
+
+    public String getUserId() {
+        return pref.getString(USER_ID ,"");
     }
 
     public void setName(String name) {

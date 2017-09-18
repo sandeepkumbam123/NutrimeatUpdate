@@ -45,6 +45,7 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,10 +55,12 @@ import java.util.List;
 import app.nutrimeat.meat.org.nutrimeat.BuildConfig;
 import app.nutrimeat.meat.org.nutrimeat.CommonFunctions;
 import app.nutrimeat.meat.org.nutrimeat.Home.TrackGPS;
+import app.nutrimeat.meat.org.nutrimeat.Navdrawer;
 import app.nutrimeat.meat.org.nutrimeat.PrefManager;
 import app.nutrimeat.meat.org.nutrimeat.R;
 import app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_mbold;
 import app.nutrimeat.meat.org.nutrimeat.Textview.p_MyCustomTextView_regular;
+import app.nutrimeat.meat.org.nutrimeat.TimePickerDialogFragment;
 import app.nutrimeat.meat.org.nutrimeat.api.API;
 import app.nutrimeat.meat.org.nutrimeat.api.CheckUser;
 import app.nutrimeat.meat.org.nutrimeat.api.UpdateOrderStatus;
@@ -74,7 +77,7 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PREORDER_CART;
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PRODUCT_CART;
 
-public class CheckoutActivity extends AppCompatActivity implements View.OnClickListener ,LocationListener{
+public class CheckoutActivity extends AppCompatActivity implements View.OnClickListener ,LocationListener , TimePickerDialogFragment.TimeListener{
 
 
     public static final int MAX_ORDER_DISTANCE = 6000;
@@ -144,7 +147,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         }
 
         if (isPreorder()) {
-            mTextViewDate.setText(getDate(mCalendar));
+            mTextViewDate.setText(setDate(mCalendar));
             mTextViewTime.setText(getTime(mCalendar));
         } else {
             mLinearLayoutDate.setVisibility(View.GONE);
@@ -280,42 +283,47 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 PrefManager manager = new PrefManager(getApplicationContext());
                 LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-                    if (canCheckOut() || true ) {
+                    if (canCheckOut()) {
 
-                        List<ModelCart> cart_itens;
-                        if (isPreorder()) {
-                            cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
-                        } else {
-                            cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
-                        }
+                        if(checkoutAdapter.getSub_total() > 100 ) {
 
-                        if (cart_itens != null && cart_itens.size() > 0) {
+                            List<ModelCart> cart_itens;
                             if (isPreorder()) {
-                                if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
-                                    showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
-                                    return;
-                                }
-                                long diff = mCalendar.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
-                                long day = 24 * 60 * 60 * 1000;
-                                if (diff > day) {
-//                                navigateToPayU();
-                                    showDialog();
-                                } else {
-                                    Toast.makeText(this, "Please select valid date", Toast.LENGTH_SHORT).show();
-                                }
-
+                                cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
                             } else {
-                                if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
-                                    showPreOrderDiialog("Store is closed now. You can Pre-Order");
-                                    return;
-                                }
-
-                                showDialog();
+                                cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
                             }
 
+                            if (cart_itens != null && cart_itens.size() > 0) {
+                                if (isPreorder()) {
+                                    if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                        showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
+                                        return;
+                                    }
+                                    long diff = mCalendar.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
+                                    long day = 24 * 60 * 60 * 1000;
+                                    if (diff > day || mCalendar.getTime().getDay() > Calendar.getInstance().getTime().getDay()) {
+//                                navigateToPayU();
+                                        showDialog();
+                                    } else {
+                                        Toast.makeText(this, "Please select valid date", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                } else {
+                                    if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                        showPreOrderDiialog("Store is closed now. You can Pre-Order");
+                                        return;
+                                    }
+
+                                    showDialog();
+                                }
+
 //                        navigateUserToPayment(cart_itens);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "No items added to cart", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
-                            Toast.makeText(getApplicationContext(), "No items added to card", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(CheckoutActivity.this, "Minimum order value should be more than ₹.100 .", Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         Toast.makeText(getApplicationContext(), "We cannot deliver order to your location", Toast.LENGTH_SHORT).show();
@@ -326,18 +334,22 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.textview_date:
                 Calendar calendar=Calendar.getInstance();
+                calendar.add(Calendar.DATE,1);
                 DatePickerDialog datePickerDialog = new DatePickerDialog(this, date, calendar
                         .get(Calendar.YEAR), calendar.get(Calendar.MONTH),
-                        (calendar.get(Calendar.DAY_OF_MONTH) + 1));
-                datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                        (calendar.get(Calendar.DAY_OF_MONTH) ));
+                datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
                 datePickerDialog.show();
 
                 break;
             case R.id.textview_time:
-                new TimePickerDialog(this, time, mCalendar
+                TimePickerDialogFragment dialog = new TimePickerDialogFragment(this);
+                dialog.show(getFragmentManager(),"TAG    ");
+                /*RangeTimePicker timePicker =new RangeTimePicker(this, time, mCalendar
                         .get(Calendar.HOUR_OF_DAY), mCalendar.get(Calendar.MINUTE),
-                        DateFormat.is24HourFormat(this)).show();
-
+                        DateFormat.is24HourFormat(this));
+                timePicker.show();
+*/
                 break;
         }
     }
@@ -596,12 +608,15 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                builder.setMessage("Your request has been placed").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                builder.setMessage("Your request has been placed .You can cancel the order in 10 mins . ").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());
                         CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART,new ArrayList<ModelCart>());
                         finish();
+                        Intent intent = new Intent(CheckoutActivity.this, Navdrawer.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
                     }
                 }).show();
 
@@ -638,6 +653,14 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private String getDate(Calendar calendar) {
+//        calendar.add(Calendar.DATE, 1);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setTimeZone(calendar.getTimeZone());
+        String date = dateFormat.format(calendar.getTime());
+        return "Oder Date : " + date;
+    }
+
+    private String setDate(Calendar calendar) {
         calendar.add(Calendar.DATE, 1);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
         dateFormat.setTimeZone(calendar.getTimeZone());
@@ -781,5 +804,22 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onLocationChanged(Location location) {
         deviceLocation = location;
+    }
+
+    @Override
+    public void onClick(String time) {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+        Date date = null;
+        Calendar calendar = Calendar.getInstance();
+        try {
+            date = sdf.parse(time);
+            calendar.setTime(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+       mCalendar.setTime(date);
+        mTextViewTime.setText(getTime(calendar));
     }
 }
