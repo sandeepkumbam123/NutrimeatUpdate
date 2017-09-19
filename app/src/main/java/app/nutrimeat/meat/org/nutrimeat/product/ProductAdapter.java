@@ -89,6 +89,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.addtocart.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.green)));
         } else {
             holder.addtocart.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.colorAccent)));
+            holder.addtocart.setText("Buy Now");
         }
 
         if (isPreOrderExist) {
@@ -96,6 +97,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             holder.preOrder.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.green)));
         } else {
             holder.preOrder.setBackgroundTintList(ColorStateList.valueOf(context.getResources().getColor(R.color.colorAccent)));
+            holder.preOrder.setText("Pre Order");
         }
 
         switch (catType) {

@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.gson.internal.LinkedTreeMap;
+
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -177,7 +179,12 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
         call.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-                Toast.makeText(context.getContext(), "order "+orderId+" has been successfully cancelled . ", Toast.LENGTH_SHORT).show();
+                Log.d("Cancel Response : ", response.body().toString());
+                if (((LinkedTreeMap) response.body()).get("status").equals("failed")) {
+                    Toast.makeText(context.getContext(), "order " + orderId + " cant't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context.getContext(), "order " + orderId + " has been successfully cancelled . ", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
