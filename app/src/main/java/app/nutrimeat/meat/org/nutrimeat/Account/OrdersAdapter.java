@@ -163,7 +163,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
                       if(product.getOrd_status() < 4) {
                           cancelOrder(product.getOrd_order_number() + "");
                       } else {
-                          Toast.makeText(context.getContext(), "order "+product.getOrd_order_number()+" cant't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
+                          Toast.makeText(context.getContext(), "order "+product.getOrd_order_number()+" can't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
                       }
                     }
                 });
@@ -181,7 +181,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
             public void onResponse(Call<Object> call, Response<Object> response) {
                 Log.d("Cancel Response : ", response.body().toString());
                 if (((LinkedTreeMap) response.body()).get("status").equals("failed")) {
-                    Toast.makeText(context.getContext(), "order " + orderId + " cant't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context.getContext(), "order " + orderId + " can't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(context.getContext(), "order " + orderId + " has been successfully cancelled . ", Toast.LENGTH_SHORT).show();
                 }
@@ -189,7 +189,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                Toast.makeText(context.getContext(), "order "+orderId+" cant't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context.getContext(), "order "+orderId+" can't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
             }
         });
     }

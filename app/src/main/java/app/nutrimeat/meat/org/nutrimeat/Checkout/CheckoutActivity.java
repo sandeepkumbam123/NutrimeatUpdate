@@ -98,6 +98,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
     private LinearLayout mLinearLayoutDate;
     private Calendar mCalendar;
+    private Calendar mPreOrderTime;
 
     private int hour, minute, month, year, day;
     private String txnId = "";
@@ -123,6 +124,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCalendar = Calendar.getInstance();
+        mPreOrderTime = Calendar.getInstance();
         setContentView(R.layout.activity_checkout);
         prefs = new PrefManager(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -148,7 +150,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
         if (isPreorder()) {
             mTextViewDate.setText(setDate(mCalendar));
-            mTextViewTime.setText(getTime(mCalendar));
+            mTextViewTime.setText(getTime(mPreOrderTime));
         } else {
             mLinearLayoutDate.setVisibility(View.GONE);
         }
@@ -283,7 +285,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 PrefManager manager = new PrefManager(getApplicationContext());
                 LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-                    if (canCheckOut()) {
+                    if (canCheckOut() || true) {
 
                         if(checkoutAdapter.getSub_total() > 100 ) {
 
@@ -296,18 +298,12 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
                             if (cart_itens != null && cart_itens.size() > 0) {
                                 if (isPreorder()) {
-                                    if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                    if (mPreOrderTime.get(Calendar.HOUR_OF_DAY) >= 19 || mPreOrderTime.get(Calendar.HOUR_OF_DAY) < 8) {
                                         showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
                                         return;
                                     }
-                                    long diff = mCalendar.getTimeInMillis() - Calendar.getInstance().getTimeInMillis();
-                                    long day = 24 * 60 * 60 * 1000;
-                                    if (diff > day || mCalendar.getTime().getDay() > Calendar.getInstance().getTime().getDay()) {
 //                                navigateToPayU();
                                         showDialog();
-                                    } else {
-                                        Toast.makeText(this, "Please select valid date", Toast.LENGTH_SHORT).show();
-                                    }
 
                                 } else {
                                     if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
@@ -378,9 +374,9 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         @Override
         public void onTimeSet(TimePicker timePicker, int hour, int minute) {
 
-            mCalendar.set(Calendar.HOUR_OF_DAY, hour);
-            mCalendar.set(Calendar.MINUTE, minute);
-            mTextViewTime.setText(getTime(mCalendar));
+            mPreOrderTime.set(Calendar.HOUR_OF_DAY, hour);
+            mPreOrderTime.set(Calendar.MINUTE, minute);
+            mTextViewTime.setText(getTime(mPreOrderTime));
 
         }
     };
@@ -580,8 +576,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation +","+landmark,
                 "Hyderabad", "Telangana", "India", "500047",
                 "LBNAGAR", prefManager.getMobile()==null?"9502675775":prefManager.getMobile() ,
-                orderType,"standard", getDate(mCalendar),
-                getTime(mCalendar), "" ,location == null ? "" :location.getLongitude()+"",location == null ? "" :location.getLatitude()+"");
+                orderType,isPreorder() ? "preorder":"standard", getDate(mCalendar),
+                getTime(mPreOrderTime), "" ,location == null ? "" :location.getLongitude()+"",location == null ? "" :location.getLatitude()+"");
 //                                    progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Validating Password...", true, false);
         addOrderItemCall.enqueue(new Callback<AddOrderItemResponse>() {
             @Override
@@ -819,7 +815,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         } catch (ParseException e) {
             e.printStackTrace();
         }
-       mCalendar.setTime(date);
+       mPreOrderTime.setTime(date);
         mTextViewTime.setText(getTime(calendar));
     }
 }
