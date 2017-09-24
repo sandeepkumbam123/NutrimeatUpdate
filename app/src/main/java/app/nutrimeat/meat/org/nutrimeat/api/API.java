@@ -83,6 +83,10 @@ public interface API {
     @GET("main/orders/format/json")
     Call<Orders_Items_Response> ordered_item_details(@Query("identity") String identity, @Query("order_no") String order_no);
 
+    @Headers("X-API-KEY:80w0g4o84wsc4gsc804c08scs00w8co4wscg848c")
+    @GET("main/is_store_closed/format/json")
+    Call<Object>  getStoreHoliday();
+
     @GET("main/stats")
     Call<StatsResponseModel> getStats();
 

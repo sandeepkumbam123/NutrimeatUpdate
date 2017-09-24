@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
+import com.google.gson.internal.LinkedTreeMap;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -118,6 +119,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private  Location location;
     private PrefManager prefs;
     private Location deviceLocation ;
+    public boolean isStoreClosed = false;
 
 
     @Override
@@ -131,6 +133,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         subtotal = (p_MyCustomTextView_regular) findViewById(R.id.subtotal);
+
+        isStoreClosed = getStoreHoliday();
 
         mTextViewDate = (Button) findViewById(R.id.textview_date);
         mTextViewTime = (Button) findViewById(R.id.textview_time);
@@ -285,39 +289,43 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 PrefManager manager = new PrefManager(getApplicationContext());
                 LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
-                    if (canCheckOut() || true) {
-
+                    if (canCheckOut()) {
+                        if(isStoreClosed && !isPreorder()) {
+                            showPreOrderDiialog("Store is closed now.You can still place a pre-order .");
+                            break;
+                        }
                         if(checkoutAdapter.getSub_total() > 100 ) {
 
-                            List<ModelCart> cart_itens;
-                            if (isPreorder()) {
-                                cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
-                            } else {
-                                cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
-                            }
-
-                            if (cart_itens != null && cart_itens.size() > 0) {
+                                List<ModelCart> cart_itens;
                                 if (isPreorder()) {
-                                    if (mPreOrderTime.get(Calendar.HOUR_OF_DAY) >= 19 || mPreOrderTime.get(Calendar.HOUR_OF_DAY) < 8) {
-                                        showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
-                                        return;
-                                    }
+                                    cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
+                                } else {
+                                    cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
+                                }
+
+                                if (cart_itens != null && cart_itens.size() > 0) {
+                                    if (isPreorder()) {
+                                        if (mPreOrderTime.get(Calendar.HOUR_OF_DAY) >= 19 || mPreOrderTime.get(Calendar.HOUR_OF_DAY) < 8) {
+                                            showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
+                                            return;
+                                        }
 //                                navigateToPayU();
                                         showDialog();
 
-                                } else {
-                                    if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
-                                        showPreOrderDiialog("Store is closed now. You can Pre-Order");
-                                        return;
+                                    } else {
+                                        if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                            showPreOrderDiialog("Store is closed now. You can Pre-Order");
+                                            return;
+                                        }
+
+                                        showDialog();
                                     }
 
-                                    showDialog();
+//                        navigateUserToPayment(cart_itens);
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "No items added to cart", Toast.LENGTH_SHORT).show();
                                 }
 
-//                        navigateUserToPayment(cart_itens);
-                            } else {
-                                Toast.makeText(getApplicationContext(), "No items added to cart", Toast.LENGTH_SHORT).show();
-                            }
                         } else {
                             Toast.makeText(CheckoutActivity.this, "Minimum order value should be more than ₹.100 .", Toast.LENGTH_SHORT).show();
                         }
@@ -817,5 +825,33 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         }
        mPreOrderTime.setTime(date);
         mTextViewTime.setText(getTime(calendar));
+    }
+
+
+    public  boolean getStoreHoliday(){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.api_url))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        API api = retrofit.create(API.class);
+        final Call<Object> isStoreClosedCall = api.getStoreHoliday();
+        isStoreClosedCall.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+              if (((LinkedTreeMap) response.body()).get("IsHoliday").toString().equalsIgnoreCase("true")) {
+                  isStoreClosed = true ;
+              } else {
+                  isStoreClosed = false ;
+              }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                Log.d(TAG ,"Internal error occured . ");
+                isStoreClosed = false ;
+            }
+        });
+
+        return isStoreClosed;
     }
 }
