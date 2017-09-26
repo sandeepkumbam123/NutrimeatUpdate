@@ -612,7 +612,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                builder.setMessage("Your request has been placed .You can cancel the order in 10 mins . ").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                builder.setMessage("Your request has been placed .You can cancel the order by contacting us . ").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());

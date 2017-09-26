@@ -157,7 +157,7 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
         getitem_details(user_name, String.valueOf(product.getOrd_order_number()), items_holder);
         builder.setView(view)
                 .setPositiveButton("OK", null)
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                /*.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                       if(product.getOrd_status() < 4) {
@@ -166,14 +166,14 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
                           Toast.makeText(context.getContext(), "order "+product.getOrd_order_number()+" can't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
                       }
                     }
-                });
+                })*/;
 
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
 
-    private void cancelOrder(final String orderId ) {
+   /* private void cancelOrder(final String orderId ) {
         final API apiService = ApiClient.getClient().create(API.class);
         Call<Object> call = apiService.cancelOrder(orderId, CANCEL_ORDER);
         call.enqueue(new Callback<Object>() {
@@ -192,5 +192,5 @@ public class OrdersAdapter extends RecyclerView.Adapter<OrdersAdapter.ProductVie
                 Toast.makeText(context.getContext(), "order "+orderId+" can't be cancelled at this point of time. ", Toast.LENGTH_SHORT).show();
             }
         });
-    }
+    }*/
 }
