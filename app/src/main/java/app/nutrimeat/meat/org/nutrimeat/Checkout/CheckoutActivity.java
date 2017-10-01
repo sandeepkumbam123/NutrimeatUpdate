@@ -286,7 +286,6 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnCheckout:
-                PrefManager manager = new PrefManager(getApplicationContext());
                 LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
                 if(lm.isProviderEnabled(LocationManager.GPS_PROVIDER) ) {
                     if (canCheckOut()) {
@@ -612,7 +611,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(CheckoutActivity.this);
-                builder.setMessage("Your request has been placed .You can cancel the order by contacting us . ").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                builder.setMessage("Your request has been placed .You can cancel your order in 5 mins  by contacting us . ").setCancelable(false).setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         CommonFunctions.setSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART,new ArrayList<ModelCart>());
@@ -713,7 +712,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 "&firstname=" + f_Name +
                 "&email=" + email +
                 "&phone=" + phone +
-                "&amount=" + /*amount*/"1" +
+                "&amount=" + amount+
 //                "&bankcode=PAYUW" + //for PayU Money
 //                "&pg=WALLET"+//for PayU Money
                 "&hash=";
@@ -728,7 +727,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             checkSumStr.append("|");
             checkSumStr.append(txnId);
             checkSumStr.append("|");
-            checkSumStr.append(/*amount*/"1");
+            checkSumStr.append(amount);
             checkSumStr.append("|");
             checkSumStr.append(product_info);
             checkSumStr.append("|");
