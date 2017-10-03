@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NutriMeat.iml" filepath="$PROJECT_DIR$/NutriMeat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NutrimeatUpdate.iml" filepath="$PROJECT_DIR$/NutrimeatUpdate.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/payUMoneysdk/payUMoneysdk.iml" filepath="$PROJECT_DIR$/payUMoneysdk/payUMoneysdk.iml" />
     </modules>

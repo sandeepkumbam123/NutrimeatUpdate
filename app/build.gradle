@@ -5,7 +5,7 @@ android {
         config {
             keyAlias 'Nutrimeat'
             keyPassword 'Nutrimeat'
-            storeFile file('/home/skumbam/NutrimeatUpdate/Nutrimeat.jks')
+            storeFile file('C:/Users/kumbh/Downloads/Nutrimeat-master/Nutrimeat-master/Nutrimeat.jks')
             storePassword 'Nutrimeat'
         }
     }
