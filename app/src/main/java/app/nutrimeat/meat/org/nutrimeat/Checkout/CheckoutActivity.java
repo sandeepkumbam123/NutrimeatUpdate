@@ -49,6 +49,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -546,9 +547,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             showProgressDialog(true);
             API api = retrofit.create(API.class);
             CheckUser checkUser = new CheckUser();
+            final List<String> quantityList = Arrays.asList(modelCart.getQuantity().split(","));
+            final List<String> desirecutList = Arrays.asList(modelCart.getDesired_cut().split(","));
             Call<AddOrderItemResponse> addOrderItemCall = api.addOrderItem(orderNum, String.valueOf(modelCart.getItem_id()), modelCart
                             .getItem_name(),
-                    modelCart.getDesired_cut(), String.valueOf(modelCart.getItem_price()), modelCart.getQuantity(), modelCart.getItem_desc());
+                    desirecutList.get(Integer.parseInt(modelCart.getSelected_desired_cut())), String.valueOf(modelCart.getItem_price()), quantityList.get(Integer.parseInt(modelCart.getSelected_quantity())), modelCart.getItem_desc());
 //                                    progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Validating Password...", true, false);
             addOrderItemCall.enqueue(new Callback<AddOrderItemResponse>() {
                 @Override
@@ -583,8 +586,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation +","+landmark,
                 "Hyderabad", "Telangana", "India", "500047",
                 "LBNAGAR", prefManager.getMobile()==null?"9502675775":prefManager.getMobile() ,
-                orderType,isPreorder() ? "preorder":"standard", getDate(mCalendar),
-                getTime(mPreOrderTime), "" ,location == null ? "" :location.getLongitude()+"",location == null ? "" :location.getLatitude()+"");
+                orderType,isPreorder() ? "preorder":"standard", getPreOrderDate(mCalendar),
+                getPreorderTime(mPreOrderTime), "" ,location == null ? "" :location.getLongitude()+"",location == null ? "" :location.getLatitude()+"");
 //                                    progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Validating Password...", true, false);
         addOrderItemCall.enqueue(new Callback<AddOrderItemResponse>() {
             @Override
@@ -655,6 +658,13 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    private String getPreOrderDate(Calendar calendar){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setTimeZone(calendar.getTimeZone());
+        String date = dateFormat.format(calendar.getTime());
+        return "" + date;
+    }
+
     private String getDate(Calendar calendar) {
 //        calendar.add(Calendar.DATE, 1);
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
@@ -679,6 +689,13 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         return "Time : " + time;
     }
 
+    private String getPreorderTime(Calendar calendar) {
+        calendar.add(Calendar.DATE, 1);
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+        timeFormat.setTimeZone(calendar.getTimeZone());
+        String time = timeFormat.format(calendar.getTime());
+        return " " + time;
+    }
 
     /******************************************************/
     private void navigateToPayU() {
