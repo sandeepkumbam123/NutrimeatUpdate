@@ -248,8 +248,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                         mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 //            }
             if( location != null )
-            Toast.makeText(CheckoutActivity.this, "Latitude : "+location.getLatitude()+ " Longitude :" +
-                    " "+location.getLongitude()+"", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(CheckoutActivity.this, "Latitude : "+location.getLatitude()+ " Longitude :" +
+//                    " "+location.getLongitude()+"", Toast.LENGTH_SHORT).show();
 
 
              // location is null , unable to fetch
