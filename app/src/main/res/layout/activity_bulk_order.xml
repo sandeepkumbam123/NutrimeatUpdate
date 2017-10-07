@@ -25,12 +25,13 @@
         android:id="@+id/activity_bulk_order"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:layout_below="@id/app_bar">
 
         <FrameLayout
             android:id="@+id/fragmentContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/toolbar"></FrameLayout>
+            ></FrameLayout>
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

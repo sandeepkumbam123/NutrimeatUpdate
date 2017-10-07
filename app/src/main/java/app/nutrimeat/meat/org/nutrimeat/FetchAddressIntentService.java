@@ -21,11 +21,18 @@ import static android.content.ContentValues.TAG;
 public class FetchAddressIntentService extends IntentService {
     protected ResultReceiver mReceiver;
 
+    public FetchAddressIntentService() {
+        // Use the TAG to name the worker thread.
+        super(TAG);
+    }
     /**
      * Creates an IntentService.  Invoked by your subclass's constructor.
      *
      * @param name Used to name the worker thread, important only for debugging.
      */
+
+
+
     public FetchAddressIntentService(String name) {
         super(name);
     }

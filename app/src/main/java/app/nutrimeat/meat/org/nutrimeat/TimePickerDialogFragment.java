@@ -1,5 +1,6 @@
 package app.nutrimeat.meat.org.nutrimeat;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.os.Bundle;
@@ -33,6 +34,9 @@ public class TimePickerDialogFragment extends DialogFragment {
     private String hoursSelectedValue ="" ;
     private TimeListener timeListener;
 
+   public TimePickerDialogFragment(){}
+
+    @SuppressLint("ValidFragment")
     public TimePickerDialogFragment(TimeListener listenr) {
         this.timeListener = listenr;
     }
