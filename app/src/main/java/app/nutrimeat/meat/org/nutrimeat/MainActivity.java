@@ -20,30 +20,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.Profile;
-import com.facebook.appevents.AppEventsLogger;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import app.nutrimeat.meat.org.nutrimeat.Account.User_Details_Model;
 import app.nutrimeat.meat.org.nutrimeat.api.API;
@@ -63,11 +39,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener, GoogleApiClient.OnConnectionFailedListener {
+public class MainActivity extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener{
 
 
-    CallbackManager callbackManager;
-    LoginButton loginButton;
     TextView welcome, forgot;
     private CheckBox chRememberMe;
     Button login_manual, signup_manual;
@@ -75,16 +49,9 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
     EditText email, password;
     private String full_name, email_id;
 
-    //Signin button
-    private SignInButton signInButton;
 
     ProgressDialog progressDialog;
 
-    //Signing Options
-    private GoogleSignInOptions gso;
-
-    //google api client
-    private GoogleApiClient mGoogleApiClient;
 
     private PrefManager prefManager;
 
@@ -102,8 +69,6 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        AppEventsLogger.activateApp(this);
         setContentView(R.layout.activity_main);
         welcome = (TextView) findViewById(R.id.welcome);
         email = (EditText) findViewById(R.id.email);
@@ -116,156 +81,10 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         // Manually checking internet connection
         checkConnection();
 
-        callbackManager = CallbackManager.Factory.create();
-        loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions("public_profile email");
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(final LoginResult loginResult) {
-
-                AccessToken accessToken = loginResult.getAccessToken();
-                Profile profile = Profile.getCurrentProfile();
-                // Facebook Email address
-                GraphRequest request = GraphRequest.newMeRequest(
-                        loginResult.getAccessToken(),
-                        new GraphRequest.GraphJSONObjectCallback() {
-                            @Override
-                            public void onCompleted(
-                                    JSONObject object,
-                                    GraphResponse response) {
-                                Log.v("LoginActivity Response ", response.toString());
-
-                                try {
-                                    full_name = object.getString("name");
-
-                                    email_id = object.getString("email");
-
-                                    // shared perference name & email saving
-
-                                    prefManager.setName(full_name);
-                                    prefManager.setEmail(email_id);
-                                    Log.d("Email Shared", prefManager.getEmail());
-                                    Log.d("Name Shared", prefManager.getName());
-                                    //Toast.makeText(getApplicationContext(), "Name " + full_name, Toast.LENGTH_LONG).show();
-                                    Retrofit retrofit = new Retrofit.Builder()
-                                            .baseUrl(getString(R.string.api_url))
-                                            .addConverterFactory(GsonConverterFactory.create())
-                                            .build();
-
-                                    API api = retrofit.create(API.class);
-                                    CheckUser checkUser = new CheckUser();
-                                    checkUser.setEmail(prefManager.getEmail());
-                                    Call<ServerResponse> responseCall = api.checkuser(checkUser);
-//                                    progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Validating Password...", true, false);
-                                    responseCall.enqueue(new Callback<ServerResponse>() {
-                                        @Override
-                                        public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-//                                            progressDialog.dismiss();
-                                            int statusCode = response.code();
-                                            ServerResponse response1 = response.body();
-                                            Log.d("CheckUser_response", "onResponse: " + statusCode);
-                                            Log.d("Status", response1.getStatus());
-                                            if (response1.getStatus().equalsIgnoreCase("failed")) {
-                                                Log.d("CheckUser_Error", response1.getError());
-                                                prefManager.setFirstTimeLaunch(false);
-                                                Intent intent = new Intent(MainActivity.this, Navdrawer.class);
-                                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                                startActivity(intent);
-                                            } else {
-                                                //REGISTER ( launch mobile number dialog and then register
-                                                LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-                                                View mView = layoutInflater.inflate(R.layout.custom, null);
-                                                AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(MainActivity.this).setTitle("Mobile Number");
-                                                alertDialogBuilderUserInput.setView(mView);
-                                                final EditText userInputDialogEditText = (EditText) mView.findViewById(R.id.userInputDialog);
-                                                alertDialogBuilderUserInput
-                                                        .setCancelable(false)
-                                                        .setPositiveButton("Send OTP", new DialogInterface.OnClickListener() {
-                                                            public void onClick(DialogInterface dialogBox, int id) {
-                                                                // ToDo get user input here
-
-                                                                prefManager.setMobile(userInputDialogEditText.getText().toString());
-                                                                Log.d("FB_NAME", prefManager.getName());
-                                                                Log.d("FB_EMAIL", prefManager.getEmail());
-                                                                Log.d("FB_MOBILE", prefManager.getMobile());
-                                                                registerUser(prefManager.getName(), prefManager.getEmail(), prefManager.getMobile());
-                                                            }
-                                                        });
-                                                AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
-                                                alertDialogAndroid.show();
-                                            }
 
 
-                                        }
-
-                                        @Override
-                                        public void onFailure(Call<ServerResponse> call, Throwable t) {
-                                            Log.d("CheckUser_Res_Google", "onFailure: " + t.getMessage());
-                                            Toast.makeText(getApplicationContext(), "Internal error. Please Try again", Toast.LENGTH_SHORT).show();
-
-                                        }
-                                    });
 
 
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        });
-
-                Bundle parameters = new Bundle();
-                parameters.putString("fields", "name,email");
-                request.setParameters(parameters);
-                request.executeAsync();
-                prefManager.setIsGuestLogin(false);
-            }
-
-            @Override
-            public void onCancel() {
-                prefManager.setIsGuestLogin(false);
-                LoginManager.getInstance().logOut();
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                prefManager.setIsGuestLogin(false);
-            }
-
-
-        });
-
-        // Configure sign-in to request the user's ID, email address, and basic
-        // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        //Initializing signinbutton
-        signInButton = (SignInButton) findViewById(R.id.google_sign_in_button);
-        signInButton.setSize(SignInButton.SIZE_WIDE);
-        signInButton.setScopes(gso.getScopeArray());
-
-
-        // Build a GoogleApiClient with access to the Google Sign-In API and the
-        // options specified by gso.
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        //Setting onclick listener to signing button
-        signInButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefManager.setIsGuestLogin(false);
-                //Creating an intent
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-
-                //Starting intent for result
-                startActivityForResult(signInIntent, RC_SIGN_IN);
-
-            }
-        });
 
 
         login_manual = (Button) findViewById(R.id.login);
@@ -466,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
 //                            prefManager.setLoginPassword("");
                         }
                         prefManager.setFirstTimeLaunch(false);
-                        Toast.makeText(getApplicationContext(), "User Login Successful", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getApplicationContext(), "User Login Successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(MainActivity.this, Navdrawer.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -503,17 +322,7 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
-        //If signin
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            //Calling a new function to handle signin
-            handleSignInResult(result);
-        }
-    }
+
 
     // Method to manually check connection status
     private void checkConnection() {
@@ -550,134 +359,8 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         MyApplication.getInstance().setConnectivityListener(this);
     }
 
-    //After the signing we are calling this function
-    private void handleSignInResult(GoogleSignInResult result) {
-        //If the login succeed
-        if (result.isSuccess()) {
-            //Getting google account
-            GoogleSignInAccount acct = result.getSignInAccount();
-            String name = acct.getDisplayName();
-            String email = acct.getEmail();
-
-            // shared perference name & email saving
-
-            prefManager.setName(name);
-            prefManager.setEmail(email);
-            Log.d("Email Shared", prefManager.getEmail());
-            Log.d("NameShared", prefManager.getName());
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl(getString(R.string.api_url))
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            API api = retrofit.create(API.class);
-            CheckUser checkUser = new CheckUser();
-            checkUser.setEmail(prefManager.getEmail());
-            Call<ServerResponse> responseCall = api.checkuser(checkUser);
-            responseCall.enqueue(new Callback<ServerResponse>() {
-                @Override
-                public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                    int statusCode = response.code();
-                    ServerResponse response1 = response.body();
-                    Log.d("CheckUser_response", "onResponse: " + statusCode);
-                    Log.d("Status", response1.getStatus());
-                    if (response1.getStatus().equalsIgnoreCase("failed")) {
-                        Log.d("CheckUser_Error", response1.getError());
-                        //Google  //LOGIN (automatically intent to main screen)
-                        prefManager.setFirstTimeLaunch(false);
-                        Intent intent = new Intent(MainActivity.this, Navdrawer.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                    } else {
-
-                        //REGISTER ( launch mobile number dialog and then register
-                        LayoutInflater layoutInflater = LayoutInflater.from(MainActivity.this);
-                        View mView = layoutInflater.inflate(R.layout.custom, null);
-                        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(MainActivity.this).setTitle("Mobile Number");
-                        alertDialogBuilderUserInput.setView(mView);
-                        final EditText mob = (EditText) mView.findViewById(R.id.userInputDialog);
-                        alertDialogBuilderUserInput
-                                .setCancelable(false)
-                                .setPositiveButton("Send OTP", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialogBox, int id) {
-                                        // ToDo get user input here
-
-                                        prefManager.setMobile(mob.getText().toString());
-                                        Log.d("MOB", mob.getText().toString());
-                                        Log.d("FB_NAME", prefManager.getName());
-                                        Log.d("FB_EMAIL", prefManager.getEmail());
-                                        Log.d("FB_MOBILE", prefManager.getMobile());
-                                        registerUser(prefManager.getName(), prefManager.getEmail(), prefManager.getMobile());
 
 
-                                    }
-                                });
-                        AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
-                        alertDialogAndroid.show();
-                    }
-
-
-                }
-
-                @Override
-                public void onFailure(Call<ServerResponse> call, Throwable t) {
-                    Log.d("CheckUser_Res_Google", "onFailure: " + t.getMessage());
-                    Toast.makeText(getApplicationContext(), "Internal error. Please Try again", Toast.LENGTH_SHORT).show();
-
-                }
-            });
-
-        } else {
-            //If login fails
-            Toast.makeText(this, "Login Failed", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void registerUser(String full_name, String email_id, final String mobile) {
-
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(getString(R.string.api_url))
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
-
-        API api = retrofit.create(API.class);
-        Request request = new Request();
-        request.setName(full_name);
-        request.setEmail(email_id);
-        request.setMobile(mobile);
-        Call<ServerResponse> responseCall = api.getrespone(request);
-//        progressDialog = ProgressDialog.show(MainActivity.this, "Please wait ...", "Registering Account", true, false);
-        responseCall.enqueue(new Callback<ServerResponse>() {
-            @Override
-            public void onResponse(Call<ServerResponse> call, Response<ServerResponse> response) {
-                int statusCode = response.code();
-//                progressDialog.dismiss();
-                ServerResponse response1 = response.body();
-                Log.d("Response_register", "onResponse: " + statusCode);
-                Log.d("Status", response1.getStatus());
-                if (response1.getStatus().equalsIgnoreCase("failed")) {
-                    Log.d("ERROR", response1.getError());
-                    Toast.makeText(getApplicationContext(), response1.getError(), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), response1.getStatus(), Toast.LENGTH_SHORT).show();
-                    sendSMSFromBox(mobile);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ServerResponse> call, Throwable t) {
-                Log.d("Response_register", "onFailure: " + t.getMessage());
-                Toast.makeText(getApplicationContext(), "Internal error. Please Try again", Toast.LENGTH_SHORT).show();
-
-
-            }
-        });
-    }
 
     public void sendSMSFromBox(final String mob) {
 
@@ -729,10 +412,6 @@ public class MainActivity extends AppCompatActivity implements ConnectivityRecei
         showSnack(isConnected);
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 
     public void verifySMS(final String mobile) {
 
