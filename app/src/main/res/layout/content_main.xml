@@ -136,23 +136,7 @@
         app:layout_constraintTop_toBottomOf="@+id/chRememberMe"/>
 
 
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/login_button"
-        android:layout_width="250dp"
-        android:layout_height="47dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:paddingBottom="15dp"
-        android:paddingTop="15dp"
-        android:text="Login"
-        android:visibility="gone"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/or"/>
+
 
 
 
