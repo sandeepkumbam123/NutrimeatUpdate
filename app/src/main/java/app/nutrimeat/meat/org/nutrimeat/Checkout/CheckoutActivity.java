@@ -488,7 +488,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View view) {
                 String deliveryLocationStr = etDeliveryLocation.getText().toString().trim();
-                String landmarkStr = etDeliveryLocation.getText().toString().trim();
+                String landmarkStr = etLandmark.getText().toString().trim();
                 if (TextUtils.isEmpty(deliveryLocationStr)) {
                     etDeliveryLocation.setError("Delivery location can't be empty");
                     etDeliveryLocation.requestFocus();
@@ -497,7 +497,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                     etLandmark.requestFocus();
                 }else{
                     deliveryLocation = etDeliveryLocation.getText().toString().trim();
-                    landmark = etDeliveryLocation.getText().toString().trim();
+                    landmark = etLandmark.getText().toString().trim();
                     orderType = "Cash On Delivery";
                     dialog.dismiss();
                     updateOrderStatus();
