@@ -508,9 +508,23 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         dialog.findViewById(R.id.textview_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                orderType = "Online Payment";
-                dialog.dismiss();
-                navigateToPayU();
+                String deliveryLocationStr = etDeliveryLocation.getText().toString().trim();
+                String landmarkStr = etDeliveryLocation.getText().toString().trim();
+                if (TextUtils.isEmpty(deliveryLocationStr)) {
+                    etDeliveryLocation.setError("Delivery location can't be empty");
+                    etDeliveryLocation.requestFocus();
+                } else if (TextUtils.isEmpty(landmarkStr)) {
+                    etLandmark.setError("Landmark can't be empty");
+                    etLandmark.requestFocus();
+                }else{
+                    deliveryLocation = etDeliveryLocation.getText().toString().trim();
+                    landmark = etDeliveryLocation.getText().toString().trim();
+                    orderType = "Online Payment";
+                    dialog.dismiss();
+                    navigateToPayU();
+
+                }
+
             }
         });
         dialog.show();
