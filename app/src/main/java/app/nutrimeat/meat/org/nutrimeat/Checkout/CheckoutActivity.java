@@ -82,7 +82,7 @@ import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PRODUCT_CART;
 public class CheckoutActivity extends AppCompatActivity implements View.OnClickListener ,LocationListener , TimePickerDialogFragment.TimeListener{
 
 
-    public static final int MAX_ORDER_DISTANCE = 6000;
+    public static final int MAX_ORDER_DISTANCE = 4500;
 
     private static final String TAG = CheckoutActivity.class.getSimpleName();
     // ArrayList<ModelCart> ListofProdcuts = new ArrayList<>();
@@ -171,7 +171,10 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             mTextViewDate.setText(setDate(mCalendar));
             mTextViewTime.setText(getTime(mPreOrderTime));
         } else {
-            mLinearLayoutDate.setVisibility(View.GONE);
+            mTextViewDate.setVisibility(View.INVISIBLE);
+            mTextViewTime.setText(getTime(mPreOrderTime));
+
+//            mLinearLayoutDate.setVisibility(View.GONE);
         }
 
         if (cart_itens != null) {

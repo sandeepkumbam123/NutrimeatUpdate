@@ -18,22 +18,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_alignParentLeft="true"
-        android:padding="5dp"
+        android:layout_centerInParent="true"
+        android:padding="10dp"
         ></Spinner>
-    <Spinner
+    <!--<Spinner
         android:id="@+id/spinner_minute"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/spinner_hour"
-        android:padding="5dp"></Spinner>
+        android:padding="5dp"></Spinner>-->
     <TextView
         android:id="@+id/okay_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/spinner_minute"
+        android:layout_below="@+id/spinner_hour"
         android:layout_alignParentEnd="true"
         android:padding="5dp"
         android:text="Okay"
