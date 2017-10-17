@@ -112,6 +112,11 @@ public interface API {
 
     @FormUrlEncoded
     @Headers("X-API-KEY:80w0g4o84wsc4gsc804c08scs00w8co4wscg848c")
+    @POST("main/promo_code_details")
+    Call<Object> getPromoCodeDetails();
+
+    @FormUrlEncoded
+    @Headers("X-API-KEY:80w0g4o84wsc4gsc804c08scs00w8co4wscg848c")
     @POST("main/add_order/format/json")
     Call<AddOrderItemResponse> addOrder(
             @Field("order_no") String orderNo,

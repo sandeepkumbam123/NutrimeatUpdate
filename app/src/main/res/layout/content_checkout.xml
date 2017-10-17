@@ -20,7 +20,40 @@
             android:id="@+id/Checkout_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/linear_date"/>
+            android:layout_above="@+id/linear_coupon_code"/>
+        <LinearLayout
+            android:id="@+id/linear_coupon_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/linear_date"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:padding="2dp">
+
+            <EditText
+                android:id="@+id/promo_code_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="80"
+                android:layout_gravity="bottom"
+                android:gravity="center_vertical"
+                android:hint="Enter a valid coupon code"
+                android:padding="5dp"
+                android:textColor="@color/black"
+                android:textSize="10sp"/>
+
+            <Button
+                android:id="@+id/bt_apply_promo_code"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="20"
+                android:gravity="center"
+                android:text="Apply"
+                android:padding="5dp"
+                android:textColor="@color/black"
+                android:textSize="10sp"/>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/linear_date"

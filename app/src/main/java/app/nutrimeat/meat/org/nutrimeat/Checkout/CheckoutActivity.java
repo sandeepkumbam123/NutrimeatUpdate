@@ -122,6 +122,10 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private Location deviceLocation ;
     public boolean isStoreClosed = false;
 
+    private Button buttonApplyPromoCode;
+    private EditText voucherCodeEditText;
+    private int discountAmount =0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +164,12 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         p_MyCustomTextView_mbold empty_view = (p_MyCustomTextView_mbold) findViewById(R.id.empty_view);
         Checkout_rv = (RecyclerView) findViewById(R.id.Checkout_rv);
         btnCheckout = (Button) findViewById(R.id.btnCheckout);
+
+        buttonApplyPromoCode = (Button) findViewById(R.id.bt_apply_promo_code);
+        voucherCodeEditText = (EditText) findViewById(R.id.promo_code_edit_text);
+
+        buttonApplyPromoCode.setOnClickListener(this);
+
         btnCheckout.setOnClickListener(this);
         cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
 
@@ -372,7 +382,47 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 timePicker.show();
 */
                 break;
+
+            case R.id.bt_apply_promo_code :
+                String promoCode = voucherCodeEditText.getText().toString();
+                if(!promoCode.isEmpty()) {
+                    //perform the API call and apply the code to the subcart
+                    getValidDetails(promoCode);
+                } else {
+                    voucherCodeEditText.setError("Please enter some valid code .");
+                }
+                break;
         }
+    }
+
+    private void getValidDetails(String promoCode) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(getString(R.string.api_url))
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        showProgressDialog(true);
+        final API api = retrofit.create(API.class);
+        Call<Object> promoCodeDetails = api.getPromoCodeDetails();
+
+        promoCodeDetails.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                showProgressDialog(false);
+                //get the discount amount and apply it here
+                discountAmount = 0;
+                checkoutAdapter.setSub_total(checkoutAdapter.getSub_total()-0);
+                subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                showProgressDialog(false);
+
+            }
+        });
+
+
     }
 
     private void showPreOrderDiialog(String message) {
@@ -614,7 +664,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         final String orderTime = dateFormat.format(new Date());
         Call<AddOrderItemResponse> addOrderItemCall = api.addOrder(orderNum  ,prefManager.getEmail(), 300,
-                "", 0, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation +","+landmark,
+                voucherCodeEditText.getText().toString().isEmpty()?"":voucherCodeEditText.getText().toString(),
+                discountAmount, checkoutAdapter.getSub_total(), cart_itens.size(), 1, 1, orderTime, prefManager.getName()==null?prefManager.getEmail():prefManager.getName(), deliveryLocation +","+landmark,
                 "Hyderabad", "Telangana", "India", "500047",
                 "LBNAGAR", prefManager.getMobile()==null?"9502675775":prefManager.getMobile() ,
                 orderType,isPreorder() ? "preorder":"standard", getPreOrderDate(mCalendar),

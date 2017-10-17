@@ -133,6 +133,10 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Produc
         return sub_total;
     }
 
+    public void setSub_total(double sub_total) {
+        this.sub_total = sub_total;
+    }
+
     @Override
     public int getItemCount() {
         return listofProdcuts.size();
