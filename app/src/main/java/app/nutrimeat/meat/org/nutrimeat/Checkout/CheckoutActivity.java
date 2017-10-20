@@ -964,19 +964,20 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(String time) {
+        if (!time.equalsIgnoreCase("Store Closed Now:00")) {
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
+            Date date = null;
+            Calendar calendar = Calendar.getInstance();
+            try {
+                date = sdf.parse(time);
+                calendar.setTime(date);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
-        Date date = null;
-        Calendar calendar = Calendar.getInstance();
-        try {
-            date = sdf.parse(time);
-            calendar.setTime(date);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            mPreOrderTime.setTime(date);
+            mTextViewTime.setText(getTime(calendar));
         }
-        mPreOrderTime.setTime(date);
-        mTextViewTime.setText(getTime(calendar));
     }
 
 
