@@ -6,6 +6,7 @@ import app.nutrimeat.meat.org.nutrimeat.Account.Orders_Items_Response;
 import app.nutrimeat.meat.org.nutrimeat.Account.Orders_Model;
 import app.nutrimeat.meat.org.nutrimeat.Account.User_Details_Model;
 import app.nutrimeat.meat.org.nutrimeat.Checkout.AddOrderItemResponse;
+import app.nutrimeat.meat.org.nutrimeat.Checkout.CouponResponseModel;
 import app.nutrimeat.meat.org.nutrimeat.Checkout.GenerateOrderNoResponse;
 import app.nutrimeat.meat.org.nutrimeat.Home.CheckAreaReponse;
 import app.nutrimeat.meat.org.nutrimeat.Home.StatsResponseModel;
@@ -112,8 +113,8 @@ public interface API {
 
     @FormUrlEncoded
     @Headers("X-API-KEY:80w0g4o84wsc4gsc804c08scs00w8co4wscg848c")
-    @POST("main/promo_code_details")
-    Call<Object> getPromoCodeDetails();
+    @POST("main/verifyCoupoun")
+    Call<CouponResponseModel> getPromoCodeDetails(@Field("id") String userId , @Field("coupoun") String code);
 
     @FormUrlEncoded
     @Headers("X-API-KEY:80w0g4o84wsc4gsc804c08scs00w8co4wscg848c")

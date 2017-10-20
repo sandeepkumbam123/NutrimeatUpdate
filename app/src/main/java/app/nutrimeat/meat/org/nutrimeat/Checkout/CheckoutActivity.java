@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,7 @@ import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.internal.LinkedTreeMap;
+import com.sasidhar.smaps.payumoney.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,6 +127,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private Button buttonApplyPromoCode;
     private EditText voucherCodeEditText;
     private int discountAmount =0;
+    private PrefManager manager;
 
 
     @Override
@@ -132,6 +135,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         mCalendar = Calendar.getInstance();
         mPreOrderTime = Calendar.getInstance();
+        manager = new PrefManager(CheckoutActivity.this);
         setContentView(R.layout.activity_checkout);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
@@ -384,7 +388,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 break;
 
             case R.id.bt_apply_promo_code :
-                String promoCode = voucherCodeEditText.getText().toString();
+                String promoCode = voucherCodeEditText.getText().toString().trim();
                 if(!promoCode.isEmpty()) {
                     //perform the API call and apply the code to the subcart
                     getValidDetails(promoCode);
@@ -402,21 +406,53 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 .build();
         showProgressDialog(true);
         final API api = retrofit.create(API.class);
-        Call<Object> promoCodeDetails = api.getPromoCodeDetails();
+        Call<CouponResponseModel> promoCodeDetails = api.getPromoCodeDetails(manager.getUserId() , promoCode);
 
-        promoCodeDetails.enqueue(new Callback<Object>() {
+        promoCodeDetails.enqueue(new Callback<CouponResponseModel>() {
             @Override
-            public void onResponse(Call<Object> call, Response<Object> response) {
+            public void onResponse(Call<CouponResponseModel> call, Response<CouponResponseModel> response) {
                 showProgressDialog(false);
                 //get the discount amount and apply it here
-                discountAmount = 0;
-                checkoutAdapter.setSub_total(checkoutAdapter.getSub_total()-0);
+                CouponResponseModel modelData = response.body();
+                Log.d("COupon Response Model" , modelData.getmMessage()+modelData.getmSuccess()+modelData.getmMessage());
+
+                CouponResponseModel.CouponDetails couponDetails = modelData.getData();
+                if(modelData.getmSuccess().equalsIgnoreCase("Success")) {
+                    if(couponDetails.getCouponType().equalsIgnoreCase("Percentage")) {
+                        discountAmount = (int) (checkoutAdapter.getSub_total() * Integer.parseInt(couponDetails.getCouponDescription()))/100;
+                        if(checkoutAdapter.getSub_total() < Integer.parseInt(couponDetails.getMinCartValue()) ) {
+                            Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
+                            discountAmount =0;
+                        } else {
+
+                            checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - discountAmount);
+                            subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+
+                        }
+                    } else {
+                        if(checkoutAdapter.getSub_total() > Integer.parseInt(couponDetails.getMinCartValue())) {
+                            discountAmount = Integer.parseInt(couponDetails.getCouponDescription());
+                            checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - Integer.parseInt(couponDetails.getCouponDescription()));
+                            subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+
+                        } else {
+                            Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+
+                } else {
+                    Toast.makeText(CheckoutActivity.this ,modelData.getmMessage() ,Toast.LENGTH_SHORT).show();
+                    voucherCodeEditText.setText("");
+                }
+
+
                 subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
 
             }
 
             @Override
-            public void onFailure(Call<Object> call, Throwable t) {
+            public void onFailure(Call<CouponResponseModel> call, Throwable t) {
                 showProgressDialog(false);
 
             }

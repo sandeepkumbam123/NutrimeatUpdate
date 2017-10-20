@@ -122,21 +122,28 @@ public class TimePickerDialogFragment extends DialogFragment {
     }
 
     private void addTimetobeOrderedPageOpened() {
+         Calendar EveningCondition1 = Calendar.getInstance();
+         Calendar EveningCondition2 = Calendar.getInstance();
+         EveningCondition1.set(Calendar.HOUR_OF_DAY ,18);
+         EveningCondition2.set(Calendar.HOUR_OF_DAY ,19);
+         EveningCondition1.set(Calendar.MINUTE ,46);
+         EveningCondition2.set(Calendar.MINUTE,1);
+
         for (String time : timeOfOrder) {
             Date date = convertStringtoTime(time);
             if(date.getTime() > mCalendar.getTime().getTime() + 46*60*1000){
                 timeorderPageOpened.add(time);
-            }
+            } else if(mCalendar.getTime().getTime() < EveningCondition2.getTime().getTime() &&  mCalendar.getTime().getTime() > EveningCondition1.getTime().getTime()) {
+               timeorderPageOpened.add("19:30");
+}                  
         }
 
     }
 
 
     private Date convertStringtoTime(String time) {
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm");
         String hournTime[] = time.split(":");
 
-        Date date = null;
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY,Integer.parseInt(hournTime[0]));
         calendar.set(Calendar.MINUTE,Integer.parseInt(hournTime[1]));
