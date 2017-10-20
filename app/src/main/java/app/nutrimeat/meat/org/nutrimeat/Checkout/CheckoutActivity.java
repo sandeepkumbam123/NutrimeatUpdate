@@ -406,7 +406,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 .build();
         showProgressDialog(true);
         final API api = retrofit.create(API.class);
-        Call<CouponResponseModel> promoCodeDetails = api.getPromoCodeDetails(manager.getUserId() , promoCode);
+        Call<CouponResponseModel> promoCodeDetails = api.getPromoCodeDetails(manager.getUserId()!= null ?manager.getEmail() : manager.getUserLoginId() , promoCode);
 
         promoCodeDetails.enqueue(new Callback<CouponResponseModel>() {
             @Override
