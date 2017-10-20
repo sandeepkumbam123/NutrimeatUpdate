@@ -413,43 +413,46 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             public void onResponse(Call<CouponResponseModel> call, Response<CouponResponseModel> response) {
                 showProgressDialog(false);
                 //get the discount amount and apply it here
-                CouponResponseModel modelData = response.body();
-                Log.d("COupon Response Model" , modelData.getmMessage()+modelData.getmSuccess()+modelData.getmMessage());
+                if(response != null) {
+                    CouponResponseModel modelData = response.body();
+                    Log.d("COupon Response Model", modelData.getmMessage() + modelData.getmSuccess() + modelData.getmMessage());
 
-                CouponResponseModel.CouponDetails couponDetails ;
-                if(modelData.getmSuccess().equalsIgnoreCase("Success")) {
-                    couponDetails= modelData.getData();
-                    if(couponDetails.getCouponType().equalsIgnoreCase("Percentage")) {
-                        discountAmount = (int) (checkoutAdapter.getSub_total() * Integer.parseInt(couponDetails.getCouponDescription()))/100;
-                        if(checkoutAdapter.getSub_total() < Integer.parseInt(couponDetails.getMinCartValue()) ) {
-                            Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
-                            discountAmount =0;
+                    CouponResponseModel.CouponDetails couponDetails;
+                    if (modelData.getmSuccess().equalsIgnoreCase("Success")) {
+                        couponDetails = modelData.getData();
+                        if (couponDetails.getCouponType().equalsIgnoreCase("Percentage")) {
+                            discountAmount = (int) (checkoutAdapter.getSub_total() * Integer.parseInt(couponDetails.getCouponDescription())) / 100;
+                            if (checkoutAdapter.getSub_total() < Integer.parseInt(couponDetails.getMinCartValue())) {
+                                Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
+                                discountAmount = 0;
+                            } else {
+
+                                checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - discountAmount);
+                                subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+
+                            }
                         } else {
+                            if (checkoutAdapter.getSub_total() > Integer.parseInt(couponDetails.getMinCartValue())) {
+                                discountAmount = Integer.parseInt(couponDetails.getCouponDescription());
+                                checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - Integer.parseInt(couponDetails.getCouponDescription()));
+                                subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
 
-                            checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - discountAmount);
-                            subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
-
+                            } else {
+                                Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
+                            }
                         }
+
+
                     } else {
-                        if(checkoutAdapter.getSub_total() > Integer.parseInt(couponDetails.getMinCartValue())) {
-                            discountAmount = Integer.parseInt(couponDetails.getCouponDescription());
-                            checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - Integer.parseInt(couponDetails.getCouponDescription()));
-                            subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
-
-                        } else {
-                            Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
-                        }
+                        Toast.makeText(CheckoutActivity.this, modelData.getmMessage(), Toast.LENGTH_SHORT).show();
+                        voucherCodeEditText.setText("");
                     }
 
 
+                    subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
                 } else {
-                    Toast.makeText(CheckoutActivity.this ,modelData.getmMessage() ,Toast.LENGTH_SHORT).show();
-                    voucherCodeEditText.setText("");
+                    Toast.makeText(CheckoutActivity.this, "We have registered this error and fix this ASAP ", Toast.LENGTH_SHORT).show();
                 }
-
-
-                subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
-
             }
 
             @Override
