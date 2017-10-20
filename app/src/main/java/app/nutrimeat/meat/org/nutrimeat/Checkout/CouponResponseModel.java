@@ -1,6 +1,7 @@
 package app.nutrimeat.meat.org.nutrimeat.Checkout;
 
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -10,10 +11,13 @@ import com.google.gson.annotations.SerializedName;
 public class CouponResponseModel  {
 
     @SerializedName("status")
+    @Expose
     private String mSuccess;
+    @Expose
     @SerializedName("message")
     private String mMessage;
     @SerializedName("data")
+    @Expose
     private CouponDetails data;
 
 
@@ -50,12 +54,16 @@ public class CouponResponseModel  {
 
     public class CouponDetails {
         @SerializedName("coupoun_method")
+        @Expose
         private String couponType;
-        @SerializedName("coupoun_description")
+        @SerializedName("value")
+        @Expose
         private String couponDescription;
         @SerializedName("min_cart_value")
+        @Expose
         private String minCartValue;
         @SerializedName("max_value")
+        @Expose
         private String maxCartValue ;
 
         public CouponDetails(String couponType, String couponDescription, String minCartValue, String maxCartValue) {

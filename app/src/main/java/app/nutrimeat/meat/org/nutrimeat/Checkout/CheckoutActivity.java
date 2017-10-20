@@ -416,8 +416,9 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 CouponResponseModel modelData = response.body();
                 Log.d("COupon Response Model" , modelData.getmMessage()+modelData.getmSuccess()+modelData.getmMessage());
 
-                CouponResponseModel.CouponDetails couponDetails = modelData.getData();
+                CouponResponseModel.CouponDetails couponDetails ;
                 if(modelData.getmSuccess().equalsIgnoreCase("Success")) {
+                    couponDetails= modelData.getData();
                     if(couponDetails.getCouponType().equalsIgnoreCase("Percentage")) {
                         discountAmount = (int) (checkoutAdapter.getSub_total() * Integer.parseInt(couponDetails.getCouponDescription()))/100;
                         if(checkoutAdapter.getSub_total() < Integer.parseInt(couponDetails.getMinCartValue()) ) {
