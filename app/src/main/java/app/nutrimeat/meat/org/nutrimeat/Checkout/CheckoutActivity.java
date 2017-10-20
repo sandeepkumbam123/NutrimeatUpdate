@@ -48,6 +48,7 @@ import org.json.JSONObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -100,6 +101,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private Button mTextViewDate;
     private Button mTextViewTime;
 
+    private boolean isApplied = false;
+
     private LinearLayout mLinearLayoutDate;
     private Calendar mCalendar;
     private Calendar mPreOrderTime;
@@ -126,7 +129,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
     private Button buttonApplyPromoCode;
     private EditText voucherCodeEditText;
-    private int discountAmount =0;
+    private float discountAmount =0;
     private PrefManager manager;
 
 
@@ -275,17 +278,17 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             mLocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocListener);
 
 
-                location = mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
-                        mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            location = mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER) == null ?
+                    mLocManager.getLastKnownLocation(LocationManager.GPS_PROVIDER) : mLocManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 //            }
             if( location != null )
 //            Toast.makeText(CheckoutActivity.this, "Latitude : "+location.getLatitude()+ " Longitude :" +
 //                    " "+location.getLongitude()+"", Toast.LENGTH_SHORT).show();
 
 
-             // location is null , unable to fetch
-            // the location details so maintaining it as null .
-            return deviceLocation == null ? inRange(location) : inRange( deviceLocation);
+                // location is null , unable to fetch
+                // the location details so maintaining it as null .
+                return deviceLocation == null ? inRange(location) : inRange( deviceLocation);
         }
 
         return false ;
@@ -327,35 +330,35 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                         }
                         if(checkoutAdapter.getSub_total() > 100 ) {
 
-                                List<ModelCart> cart_itens;
+                            List<ModelCart> cart_itens;
+                            if (isPreorder()) {
+                                cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
+                            } else {
+                                cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
+                            }
+
+                            if (cart_itens != null && cart_itens.size() > 0) {
                                 if (isPreorder()) {
-                                    cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART);
-                                } else {
-                                    cart_itens = CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PRODUCT_CART);
-                                }
-
-                                if (cart_itens != null && cart_itens.size() > 0) {
-                                    if (isPreorder()) {
-                                        if (mPreOrderTime.get(Calendar.HOUR_OF_DAY) >= 19 || mPreOrderTime.get(Calendar.HOUR_OF_DAY) < 8) {
-                                            showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
-                                            return;
-                                        }
+                                    if (mPreOrderTime.get(Calendar.HOUR_OF_DAY) >= 19 || mPreOrderTime.get(Calendar.HOUR_OF_DAY) < 8) {
+                                        showPreOrderDiialog("Sorry! the items cannot be delivered in between 7PM to 8AM. Please update the time");
+                                        return;
+                                    }
 //                                navigateToPayU();
-                                        showDialog();
+                                    showDialog();
 
-                                    } else {
-                                        if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
-                                            showPreOrderDiialog("Store is closed now. You can Pre-Order");
-                                            return;
-                                        }
-
-                                        showDialog();
+                                } else {
+                                    if (mCalendar.get(Calendar.HOUR_OF_DAY) >= 19 || mCalendar.get(Calendar.HOUR_OF_DAY) < 8) {
+                                        showPreOrderDiialog("Store is closed now. You can Pre-Order");
+                                        return;
                                     }
 
-//                        navigateUserToPayment(cart_itens);
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "No items added to cart", Toast.LENGTH_SHORT).show();
+                                    showDialog();
                                 }
+
+//                        navigateUserToPayment(cart_itens);
+                            } else {
+                                Toast.makeText(getApplicationContext(), "No items added to cart", Toast.LENGTH_SHORT).show();
+                            }
 
                         } else {
                             Toast.makeText(CheckoutActivity.this, "Minimum order value should be more than ₹.100 .", Toast.LENGTH_SHORT).show();
@@ -391,7 +394,8 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 String promoCode = voucherCodeEditText.getText().toString().trim();
                 if(!promoCode.isEmpty()) {
                     //perform the API call and apply the code to the subcart
-                    getValidDetails(promoCode);
+                    if(!isApplied)
+                        getValidDetails(promoCode);
                 } else {
                     voucherCodeEditText.setError("Please enter some valid code .");
                 }
@@ -413,7 +417,9 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             public void onResponse(Call<CouponResponseModel> call, Response<CouponResponseModel> response) {
                 showProgressDialog(false);
                 //get the discount amount and apply it here
-                if(response != null) {
+                DecimalFormat decimalFormat = new DecimalFormat("#.##");
+                if(response != null && !isApplied) {
+
                     CouponResponseModel modelData = response.body();
                     Log.d("COupon Response Model", modelData.getmMessage() + modelData.getmSuccess() + modelData.getmMessage());
 
@@ -421,21 +427,25 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                     if (modelData.getmSuccess().equalsIgnoreCase("Success")) {
                         couponDetails = modelData.getData();
                         if (couponDetails.getCouponType().equalsIgnoreCase("Percentage")) {
-                            discountAmount = (int) (checkoutAdapter.getSub_total() * Integer.parseInt(couponDetails.getCouponDescription())) / 100;
+                            discountAmount = (float) (checkoutAdapter.getSub_total() * Double.parseDouble(couponDetails.getCouponDescription())) / 100;
                             if (checkoutAdapter.getSub_total() < Integer.parseInt(couponDetails.getMinCartValue())) {
                                 Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
                                 discountAmount = 0;
                             } else {
-
+                                discountAmount = Float.valueOf(decimalFormat.format(discountAmount));
+                                isApplied = true ;
                                 checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - discountAmount);
                                 subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+                                Toast.makeText(CheckoutActivity.this, "Coupon Applied Successfully", Toast.LENGTH_SHORT).show();
 
                             }
                         } else {
                             if (checkoutAdapter.getSub_total() > Integer.parseInt(couponDetails.getMinCartValue())) {
-                                discountAmount = Integer.parseInt(couponDetails.getCouponDescription());
+                                discountAmount = Float.valueOf(decimalFormat.format(couponDetails.getCouponDescription()));
+                                isApplied = true ;
                                 checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - Integer.parseInt(couponDetails.getCouponDescription()));
                                 subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+                                Toast.makeText(CheckoutActivity.this, "Coupon Applied Successfully", Toast.LENGTH_SHORT).show();
 
                             } else {
                                 Toast.makeText(CheckoutActivity.this, "Coupon can't be applied .Min cart Value is " + couponDetails.getMinCartValue(), Toast.LENGTH_SHORT).show();
@@ -451,7 +461,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
 
                     subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
                 } else {
-                    Toast.makeText(CheckoutActivity.this, "We have registered this error and fix this ASAP ", Toast.LENGTH_SHORT).show();
+                    if (isApplied) {
+                        Toast.makeText(CheckoutActivity.this, "Coupon Already Applied ", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(CheckoutActivity.this, "We have registered this error and fix this ASAP ", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
@@ -961,7 +975,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         } catch (ParseException e) {
             e.printStackTrace();
         }
-       mPreOrderTime.setTime(date);
+        mPreOrderTime.setTime(date);
         mTextViewTime.setText(getTime(calendar));
     }
 
@@ -976,11 +990,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
         isStoreClosedCall.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
-              if (((LinkedTreeMap) response.body()).get("IsHoliday").toString().equalsIgnoreCase("true")) {
-                  isStoreClosed = true ;
-              } else {
-                  isStoreClosed = false ;
-              }
+                if (((LinkedTreeMap) response.body()).get("IsHoliday").toString().equalsIgnoreCase("true")) {
+                    isStoreClosed = true ;
+                } else {
+                    isStoreClosed = false ;
+                }
             }
 
             @Override

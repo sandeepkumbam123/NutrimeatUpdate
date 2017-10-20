@@ -51,7 +51,8 @@
                 android:gravity="center"
                 android:text="Apply"
                 android:padding="5dp"
-                android:textColor="@color/black"
+                android:background="@color/colorAccent"
+                android:textColor="@color/white"
                 android:textSize="10sp"/>
 
         </LinearLayout>
@@ -71,8 +72,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="50"
                 android:gravity="center"
-                android:padding="5dp"
-                android:textColor="@color/black"
+                android:layout_margin="5dp"
+                android:background="@color/colorAccent"
+                android:textColor="@color/white"
                 android:textSize="10sp"/>
 
             <Button
@@ -81,8 +83,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="50"
                 android:gravity="center"
-                android:padding="5dp"
-                android:textColor="@color/black"
+                android:layout_margin="5dp"
+                android:background="@color/colorAccent"
+                android:textColor="@color/white"
                 android:textSize="10sp"/>
 
         </LinearLayout>
