@@ -86,13 +86,9 @@ public class TimePickerDialogFragment extends DialogFragment {
 
                             Toast.makeText(getActivity(), hoursSelectedValue , Toast.LENGTH_SHORT).show();
                 } else {
-                    if (!hoursSelectedValue.equalsIgnoreCase("Store Closed Now")) {
-                        Toast.makeText(getActivity(), "Plese select the Appropriate Time to deliver ", Toast.LENGTH_SHORT).show();
-                        dismiss();
-                    } else {
+                    
                         timeListener.onClick(hoursSelectedValue/*+":"+minutesSelectedValue */ + ":00");
                         dismiss();
-                    }
                 }
             }
         });
@@ -142,9 +138,6 @@ public class TimePickerDialogFragment extends DialogFragment {
                 timeorderPageOpened.add(time);
             } else if(mCalendar.getTime().getTime() < EveningCondition2.getTime().getTime() &&  mCalendar.getTime().getTime() > EveningCondition1.getTime().getTime()) {
                timeorderPageOpened.add("19:30");
-            } else {
-                timeorderPageOpened.add("Store Closed Now");
-                break;
             }
         }
 

@@ -434,6 +434,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                             } else {
                                 discountAmount = Float.valueOf(decimalFormat.format(discountAmount));
                                 isApplied = true ;
+                                if (couponDetails.getMaxCartValue()!= null){
+                                    if (discountAmount > Integer.parseInt(couponDetails.getMaxCartValue())) {
+                                        discountAmount = Integer.parseInt(couponDetails.getMaxCartValue());
+                                    }
+                                }
                                 checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - discountAmount);
                                 subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
                                 Toast.makeText(CheckoutActivity.this, "Coupon Applied Successfully", Toast.LENGTH_SHORT).show();
