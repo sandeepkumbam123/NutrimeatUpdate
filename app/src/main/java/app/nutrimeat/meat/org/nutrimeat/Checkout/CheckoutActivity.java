@@ -201,8 +201,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             mTextViewTime.setText(getTime(convertStringtoCalendarTime(timeorderPageOpened.get(0))));
         } else {
             mTextViewDate.setVisibility(View.INVISIBLE);
-            mTextViewTime.setText(getTime(convertStringtoCalendarTime(timeorderPageOpened.get(0))));
-
+             if(timeorderPageOpened.size() == 0 || timeorderPageOpened == null) {
+                 mTextViewTime.setText("Delivery Not Available");
+             } else {
+                 mTextViewTime.setText(getTime(convertStringtoCalendarTime(timeorderPageOpened.get(0))));
+             }
 //            mLinearLayoutDate.setVisibility(View.GONE);
         }
 
