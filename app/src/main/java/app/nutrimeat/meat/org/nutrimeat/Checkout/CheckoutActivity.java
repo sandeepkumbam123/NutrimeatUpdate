@@ -132,6 +132,11 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private float discountAmount =0;
     private PrefManager manager;
 
+    private String timeOfOrder[] = {"07:30" ,"08:00" ,"08:30" ,"09:00" ,"09:30" ,"10:00", "10:30" ,"11:00" ,"11:30", "12:00",
+            "12:30","13:00","13:30","15:30","16:00","16:30","17:00","17:30","18:00",
+            "19:00","19:30"};
+    private ArrayList<String> timeorderPageOpened =new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,12 +189,19 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
             cart_itens.addAll(CommonFunctions.getSharedPreferenceProductList(CheckoutActivity.this, PREF_PREORDER_CART));
         }
 
+        if(isPreorder()){
+            for (String time : timeOfOrder)
+                timeorderPageOpened .add(time);
+        } else {
+            addTimetobeOrderedPageOpened();
+        }
+
         if (isPreorder()) {
             mTextViewDate.setText(setDate(mCalendar));
-            mTextViewTime.setText(getTime(mPreOrderTime));
+            mTextViewTime.setText(getTime(convertStringtoCalendarTime(timeorderPageOpened.get(0))));
         } else {
             mTextViewDate.setVisibility(View.INVISIBLE);
-            mTextViewTime.setText(getTime(mPreOrderTime));
+            mTextViewTime.setText(getTime(convertStringtoCalendarTime(timeorderPageOpened.get(0))));
 
 //            mLinearLayoutDate.setVisibility(View.GONE);
         }
@@ -401,6 +413,45 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                 }
                 break;
         }
+    }
+    private void addTimetobeOrderedPageOpened() {
+        Calendar EveningCondition1 = Calendar.getInstance();
+        Calendar EveningCondition2 = Calendar.getInstance();
+        EveningCondition1.set(Calendar.HOUR_OF_DAY ,18);
+        EveningCondition2.set(Calendar.HOUR_OF_DAY ,19);
+        EveningCondition1.set(Calendar.MINUTE ,46);
+        EveningCondition2.set(Calendar.MINUTE,1);
+
+        for (String time : timeOfOrder) {
+            Date date = convertStringtoTime(time);
+            if(date.getTime() > mCalendar.getTime().getTime() + 46*60*1000){
+                timeorderPageOpened.add(time);
+            } else if(mCalendar.getTime().getTime() < EveningCondition2.getTime().getTime() &&  mCalendar.getTime().getTime() > EveningCondition1.getTime().getTime()) {
+                timeorderPageOpened.add("19:30");
+            }
+        }
+
+    }
+
+    private Date convertStringtoTime(String time) {
+        String hournTime[] = time.split(":");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,Integer.parseInt(hournTime[0]));
+        calendar.set(Calendar.MINUTE,Integer.parseInt(hournTime[1]));
+
+
+        return calendar.getTime();
+    }
+private Calendar convertStringtoCalendarTime(String time) {
+        String hournTime[] = time.split(":");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY,Integer.parseInt(hournTime[0]));
+        calendar.set(Calendar.MINUTE,Integer.parseInt(hournTime[1]));
+
+
+        return calendar;
     }
 
     private void getValidDetails(String promoCode) {
