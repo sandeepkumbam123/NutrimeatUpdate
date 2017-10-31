@@ -878,7 +878,7 @@ private Calendar convertStringtoCalendarTime(String time) {
         SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
         timeFormat.setTimeZone(calendar.getTimeZone());
         String time = timeFormat.format(calendar.getTime());
-        return "Time : " + time;
+        return "Delivery Time : " + time;
     }
 
     private String getPreorderTime(Calendar calendar) {
