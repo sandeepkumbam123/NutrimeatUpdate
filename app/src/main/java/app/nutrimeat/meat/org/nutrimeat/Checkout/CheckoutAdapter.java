@@ -26,7 +26,7 @@ import app.nutrimeat.meat.org.nutrimeat.product.ModelCart;
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PREORDER_CART;
 import static app.nutrimeat.meat.org.nutrimeat.PrefManager.PREF_PRODUCT_CART;
 
-
+// this shows the list of cart items been added inb the checkout activity
 public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.ProductViewHolder> {
 
     private int rowLayout;
