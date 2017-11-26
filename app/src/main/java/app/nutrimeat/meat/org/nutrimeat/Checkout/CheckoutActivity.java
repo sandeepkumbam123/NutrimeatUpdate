@@ -120,7 +120,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
     private List<ModelCart> cart_itens, updatedCartItems = new ArrayList<>();
     private String deliveryLocation;
     private String landmark;
-    private String orderType;
+    private String orderType ="Cash On Delivery";
     private String transactionId;
     private  Location location;
     private PrefManager prefs;
@@ -343,7 +343,7 @@ public class CheckoutActivity extends AppCompatActivity implements View.OnClickL
                             showPreOrderDiialog("Store is closed now.You can still place a pre-order .");
                             break;
                         }
-                        if(checkoutAdapter.getSub_total() > 100 ) {
+                        if(checkoutAdapter != null && checkoutAdapter.getSub_total() > 100 ) {
 
                             List<ModelCart> cart_itens;
                             if (isPreorder()) {
@@ -464,7 +464,7 @@ private Calendar convertStringtoCalendarTime(String time) {
                 .build();
         showProgressDialog(true);
         final API api = retrofit.create(API.class);
-        Call<CouponResponseModel> promoCodeDetails = api.getPromoCodeDetails(manager.getUserId()!= null ?manager.getEmail() : manager.getUserLoginId() , promoCode);
+        Call<CouponResponseModel> promoCodeDetails = api.getPromoCodeDetails(manager.getEmail()!= null ?manager.getEmail() : manager.getMobile() , promoCode);
 
         promoCodeDetails.enqueue(new Callback<CouponResponseModel>() {
             @Override
@@ -478,6 +478,7 @@ private Calendar convertStringtoCalendarTime(String time) {
                     Log.d("COupon Response Model", modelData.getmMessage() + modelData.getmSuccess() + modelData.getmMessage());
 
                     CouponResponseModel.CouponDetails couponDetails;
+                    if (checkoutAdapter != null) {
                     if (modelData.getmSuccess().equalsIgnoreCase("Success")) {
                         couponDetails = modelData.getData();
                         if (couponDetails.getCouponType().equalsIgnoreCase("Percentage")) {
@@ -487,8 +488,8 @@ private Calendar convertStringtoCalendarTime(String time) {
                                 discountAmount = 0;
                             } else {
                                 discountAmount = Float.valueOf(decimalFormat.format(discountAmount));
-                                isApplied = true ;
-                                if (couponDetails.getMaxCartValue()!= null){
+                                isApplied = true;
+                                if (couponDetails.getMaxCartValue() != null) {
                                     if (discountAmount > Integer.parseInt(couponDetails.getMaxCartValue())) {
                                         discountAmount = Integer.parseInt(couponDetails.getMaxCartValue());
                                     }
@@ -499,9 +500,9 @@ private Calendar convertStringtoCalendarTime(String time) {
 
                             }
                         } else {
-                            if (checkoutAdapter.getSub_total() > Integer.parseInt(couponDetails.getMinCartValue())) {
+                            if (checkoutAdapter.getSub_total() > Integer.parseInt(couponDetails.getMinCartValue().split(".")[0])) {
                                 discountAmount = Float.valueOf(decimalFormat.format(couponDetails.getCouponDescription()));
-                                isApplied = true ;
+                                isApplied = true;
                                 checkoutAdapter.setSub_total(checkoutAdapter.getSub_total() - Integer.parseInt(couponDetails.getCouponDescription()));
                                 subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
                                 Toast.makeText(CheckoutActivity.this, "Coupon Applied Successfully", Toast.LENGTH_SHORT).show();
@@ -519,6 +520,7 @@ private Calendar convertStringtoCalendarTime(String time) {
 
 
                     subtotal.setText(String.valueOf(checkoutAdapter.getSub_total()));
+                }
                 } else {
                     if (isApplied) {
                         Toast.makeText(CheckoutActivity.this, "Coupon Already Applied ", Toast.LENGTH_SHORT).show();
@@ -1035,6 +1037,7 @@ private Calendar convertStringtoCalendarTime(String time) {
                 e.printStackTrace();
             }
             mPreOrderTime.setTime(date);
+            if (calendar != null)
             mTextViewTime.setText(getTime(calendar));
         }
     }

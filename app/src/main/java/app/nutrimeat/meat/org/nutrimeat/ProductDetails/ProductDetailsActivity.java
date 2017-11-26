@@ -288,8 +288,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
 
     boolean contains(List<ModelCart> list, int product_id) {
         for (ModelCart item : list) {
-            if (item.getItem_id() == product_id) {
-                return true;
+            if (item != null) {
+                if (item.getItem_id() == product_id) {
+                    return true;
+                }
             }
         }
         return false;
@@ -299,8 +301,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements View.On
         for (int i = 0; i < list.size(); i++) {
             ModelCart item = list.get(i);
             //Product_Model item : list) {
-            if (item.getItem_id() == product_id) {
-                list.remove(i);
+            if (item!= null) {
+                if (item.getItem_id() == product_id) {
+                    list.remove(i);
+                }
             }
         }
         return list;

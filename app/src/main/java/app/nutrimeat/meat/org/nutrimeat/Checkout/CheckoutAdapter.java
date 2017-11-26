@@ -130,7 +130,7 @@ public class CheckoutAdapter extends RecyclerView.Adapter<CheckoutAdapter.Produc
     }
 
     public double getSub_total() {
-        return sub_total;
+        return sub_total ;
     }
 
     public void setSub_total(double sub_total) {

@@ -90,7 +90,7 @@ public class Products extends Fragment {
                     ArrayList<String> isadd_to_cart = new ArrayList<>();
                     for (int i = 0; i < products.size(); i++)
                         isadd_to_cart.add("true");
-                    CommonFunctions.setSharedPreferenceStringList(getContext(), "isadd_to_cart", isadd_to_cart);
+                    CommonFunctions.setSharedPreferenceStringList(getActivity(), "isadd_to_cart", isadd_to_cart);
                     adapter = new ProductAdapter(products, R.layout.product_item, Products.this, isadd_to_cart, cat);
                     mRecycler.setAdapter(adapter);
 

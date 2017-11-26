@@ -108,12 +108,14 @@ public class Navdrawer extends AppCompatActivity
             @Override
             public void onResponse(Call<User_Details_Model> call, Response<User_Details_Model> response) {
                 User_Details_Model model = response.body();
-                prefManager.setEmail(model.getEmail());
-                prefManager.setMobile(model.getPhoneNumber());
-                prefManager.setName(model.getUserName());
+                if (model != null) {
+                    prefManager.setEmail(model.getEmail());
+                    prefManager.setMobile(model.getPhoneNumber());
+                    prefManager.setName(model.getUserName());
 
-                if(emailNav != null) {
-                    emailNav.setText(model.getUserName()==null?prefManager.getMobile():prefManager.getName());
+                    if (emailNav != null) {
+                        emailNav.setText(model.getUserName() == null ? prefManager.getMobile() : prefManager.getName());
+                    }
                 }
             }
 
